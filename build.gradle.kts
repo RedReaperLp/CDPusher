@@ -1,5 +1,9 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     id("java")
+    id("application")
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "com.github.redreaperlp"
@@ -10,10 +14,15 @@ repositories {
 }
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.9.1"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    implementation("org:jaudiotagger:2.0.3")
 }
 
-tasks.test {
-    useJUnitPlatform()
+tasks.withType<ShadowJar> {
+    manifest {
+        attributes["Main-Class"] = "com.github.redreaperlp.cdpusher.Main"
+    }
+}
+
+application {
+    mainClass.set("com.github.redreaperlp.cdpusher.Main")
 }
