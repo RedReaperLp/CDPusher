@@ -15,6 +15,11 @@ repositories {
 
 dependencies {
     implementation("org:jaudiotagger:2.0.3")
+    implementation("org.json", "json", "20231013")
+    implementation("com.zaxxer","HikariCP", "5.1.0")
+    implementation("mysql", "mysql-connector-java", "8.0.33")
+    implementation("org.slf4j", "slf4j-simple", "1.7.30")
+    implementation("org.slf4j", "slf4j-api", "1.7.30")
 }
 
 tasks.withType<ShadowJar> {
@@ -25,4 +30,10 @@ tasks.withType<ShadowJar> {
 
 application {
     mainClass.set("com.github.redreaperlp.cdpusher.Main")
+}
+
+tasks {
+    compileJava {
+        options.encoding = "UTF-8"
+    }
 }

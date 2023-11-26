@@ -3,6 +3,12 @@ package com.github.redreaperlp.cdpusher;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 
+import javax.swing.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class Song {
 
     String title;
@@ -83,5 +89,64 @@ public class Song {
                 ", discNo='" + discNo + '\'' +
                 ", timeInSeconds=" + timeInSeconds +
                 '}';
+    }
+
+    public void pushToDB(int discNo, int totalDiscs, Connection connection) {
+        if (existsInDB(connection)) {
+            int dialogResult = JOptionPane.showConfirmDialog(null, "Song already exists in database: " + title + " - " + artist + " - " + year + "\nDo you want to update it?", "Song already exists", JOptionPane.YES_NO_OPTION);
+            if (dialogResult == JOptionPane.YES_OPTION) {
+                try {
+                    PreparedStatement stmt = connection.prepareStatement("UPDATE radio_music.music SET title = ?, artist = ?, album = ?, track = ?, year = ?, genre = ?, comment = ?, interpreter = ? WHERE title = ? AND artist = ? AND year = ?");
+                    stmt.setString(1, title);
+                    stmt.setString(2, artist);
+                    stmt.setString(3, album);
+                    stmt.setString(4, track);
+                    stmt.setInt(5, year.isEmpty() ? 0 : Integer.parseInt(year));
+                    stmt.setString(6, genre);
+                    stmt.setString(7, comment);
+                    stmt.setString(8, composer);
+                    stmt.setString(9, title);
+                    stmt.setString(10, artist);
+                    stmt.setInt(11, year.isEmpty() ? 0 : Integer.parseInt(year));
+                    stmt.execute();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                return;
+            } else {
+                return;
+            }
+        }
+        try {
+            PreparedStatement stmt = connection.prepareStatement("INSERT INTO radio_music.music (title, artist, album, track, year, genre, comment, interpreter) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            stmt.setString(1, title);
+            stmt.setString(2, artist);
+            stmt.setString(3, album);
+            stmt.setString(4, track);
+            stmt.setInt(5, year.isEmpty() ? 0 : Integer.parseInt(year));
+            stmt.setString(6, genre);
+            stmt.setString(7, comment);
+            stmt.setString(8, composer);
+            stmt.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean existsInDB(Connection connection) {
+        try {
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM radio_music.music WHERE title = ? AND artist = ? AND year = ?");
+            stmt.setString(1, title);
+            stmt.setString(2, artist);
+            stmt.setInt(3, year.isEmpty() ? 0 : Integer.parseInt(year));
+            stmt.execute();
+            ResultSet resultSet = stmt.getResultSet();
+            if (resultSet.next()) {
+                return true;
+            }
+            return false;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
