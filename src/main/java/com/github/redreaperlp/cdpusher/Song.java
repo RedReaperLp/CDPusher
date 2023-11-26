@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Song {
 
@@ -27,12 +29,33 @@ public class Song {
         this.artist = tag.getFirst(FieldKey.ARTIST);
         this.album = tag.getFirst(FieldKey.ALBUM);
         this.track = tag.getFirst(FieldKey.TRACK);
+        System.out.println(tag.getFirst(FieldKey.COVER_ART ));
         this.year = tag.getFirst(FieldKey.YEAR);
         this.genre = tag.getFirst(FieldKey.GENRE);
         this.comment = tag.getFirst(FieldKey.COMMENT);
         this.composer = tag.getFirst(FieldKey.COMPOSER);
         this.discNo = tag.getFirst(FieldKey.DISC_NO);
         this.timeInSeconds = timeInSeconds;
+
+        //remove brackets from genre
+        Pattern pattern = Pattern.compile("\\(.*\\)");
+        Matcher matcher = pattern.matcher(genre);
+        if (matcher.find()) {
+            genre = genre.replace(matcher.group(0), "");
+        }
+        genre = genre.trim();
+        System.out.println(genre);
+
+        if (album.toLowerCase().contains("unbekannt") || album.toLowerCase().contains("unknown")) {
+            album = "Unbekannt";
+        }
+
+        if (genre.toLowerCase().contains("unbekannt") || genre.toLowerCase().contains("unknown")) {
+            genre = "Unbekannt";
+        }
+        if (composer.isEmpty()) {
+            composer = "Unbekannt";
+        }
     }
 
     public String getTitle() {
@@ -95,43 +118,52 @@ public class Song {
         if (existsInDB(connection)) {
             int dialogResult = JOptionPane.showConfirmDialog(null, "Song already exists in database: " + title + " - " + artist + " - " + year + "\nDo you want to update it?", "Song already exists", JOptionPane.YES_NO_OPTION);
             if (dialogResult == JOptionPane.YES_OPTION) {
-                try {
-                    PreparedStatement stmt = connection.prepareStatement("UPDATE radio_music.music SET title = ?, artist = ?, album = ?, track = ?, year = ?, genre = ?, comment = ?, interpreter = ? WHERE title = ? AND artist = ? AND year = ?");
-                    stmt.setString(1, title);
-                    stmt.setString(2, artist);
-                    stmt.setString(3, album);
-                    stmt.setString(4, track);
-                    stmt.setInt(5, year.isEmpty() ? 0 : Integer.parseInt(year));
-                    stmt.setString(6, genre);
-                    stmt.setString(7, comment);
-                    stmt.setString(8, composer);
-                    stmt.setString(9, title);
-                    stmt.setString(10, artist);
-                    stmt.setInt(11, year.isEmpty() ? 0 : Integer.parseInt(year));
-                    stmt.execute();
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-                return;
-            } else {
-                return;
+                updateDB(connection);
             }
+        } else {
+            insertIntoDB(connection);
         }
+    }
+
+    private void updateDB(Connection connection) {
         try {
-            PreparedStatement stmt = connection.prepareStatement("INSERT INTO radio_music.music (title, artist, album, track, year, genre, comment, interpreter) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            stmt.setString(1, title);
-            stmt.setString(2, artist);
-            stmt.setString(3, album);
-            stmt.setString(4, track);
-            stmt.setInt(5, year.isEmpty() ? 0 : Integer.parseInt(year));
-            stmt.setString(6, genre);
-            stmt.setString(7, comment);
-            stmt.setString(8, composer);
-            stmt.execute();
+            String updateQuery = "UPDATE radio_music.music SET title = ?, artist = ?, album = ?, track = ?, year = ?, genre = ?, comment = ?, composer = ?, length = ? WHERE title = ? AND artist = ? AND year = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
+                stmt.setString(10, title);
+                stmt.setString(11, artist);
+                stmt.setInt(12, year.isEmpty() ? 0 : Integer.parseInt(year));
+                setParameters(stmt);
+                stmt.execute();
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
+
+    private void insertIntoDB(Connection connection) {
+        try {
+            String insertQuery = "INSERT INTO radio_music.music (title, artist, album, track, year, genre, comment, composer, length) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement stmt = connection.prepareStatement(insertQuery)) {
+                setParameters(stmt);
+                stmt.execute();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void setParameters(PreparedStatement stmt) throws SQLException {
+        stmt.setString(1, title);
+        stmt.setString(2, artist);
+        stmt.setString(3, album);
+        stmt.setString(4, track);
+        stmt.setInt(5, year.isEmpty() ? 0 : Integer.parseInt(year));
+        stmt.setString(6, genre);
+        stmt.setString(7, comment);
+        stmt.setString(8, composer);
+        stmt.setLong(9, timeInSeconds);
+    }
+
 
     public boolean existsInDB(Connection connection) {
         try {

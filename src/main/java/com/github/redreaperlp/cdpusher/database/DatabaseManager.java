@@ -21,7 +21,7 @@ public class DatabaseManager {
             hikariConfig.setUsername(conf.getUser());
             hikariConfig.setPassword(conf.getPassword());
             hikariConfig.setMaximumPoolSize(10);
-            hikariConfig.setDriverClassName("com.mysql.jdbc.Driver");
+            hikariConfig.setDriverClassName("com.mysql.cj.jdbc.Driver");
             dataSource = new HikariDataSource(hikariConfig);
         }
 
@@ -33,4 +33,8 @@ public class DatabaseManager {
             }
             return null;
         }
+
+    public void close() {
+        dataSource.close();
+    }
 }
