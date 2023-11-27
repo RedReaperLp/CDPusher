@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,6 +57,19 @@ public class Song {
         if (composer.isEmpty()) {
             composer = "Unbekannt";
         }
+    }
+
+    public Song(String title, String interpreter, String album, String track, String year, String genre, String comment, String composer, String discNo, String length) {
+        this.title = title;
+        this.artist = interpreter;
+        this.album = album;
+        this.track = track;
+        this.year = year;
+        this.genre = genre;
+        this.comment = comment;
+        this.composer = composer;
+        this.discNo = discNo;
+        this.timeInSeconds = Long.parseLong(length);
     }
 
     public String getTitle() {
@@ -180,5 +194,9 @@ public class Song {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<String> toArray() {
+        return List.of(title, artist, album, track, year, genre, comment, composer, discNo, String.valueOf(timeInSeconds));
     }
 }
