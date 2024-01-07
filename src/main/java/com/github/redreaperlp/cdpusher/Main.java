@@ -1,6 +1,7 @@
 package com.github.redreaperlp.cdpusher;
 
 import com.github.redreaperlp.cdpusher.database.DatabaseConfiguration;
+import com.github.redreaperlp.cdpusher.http.DiscOgsSearch;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
@@ -8,10 +9,8 @@ import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
-import org.json.JSONObject;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -21,7 +20,6 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.logging.Logger;
 
 public class Main {
 
@@ -44,90 +42,106 @@ public class Main {
     JPanel panel = new JPanel();
 
     public void init() {
-        progressBar.setIndeterminate(true);
-        progressBar.setStringPainted(true);
-        progressBar.setString("Lade Dateien...");
-        progressBar.setMaximum(100);
-        progressBar.setMinimum(0);
-        progressBar.setVisible(true);
-
-        table.setFillsViewportHeight(true);
-        table.setPreferredSize(new Dimension(800, 100));
-        table.setVisible(true);
-
-        JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setPreferredSize(new Dimension(1600, 900));
-        scrollPane.setVisible(true);
-
-        panel.setPreferredSize(new Dimension(1600, 900));
-        panel.setLayout(new BorderLayout());
-        panel.add(progressBar, BorderLayout.NORTH);
-        panel.add(scrollPane, BorderLayout.CENTER);
-        panel.setVisible(true);
-
-        JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(panel);
-        frame.pack();
-        frame.setVisible(true);
-        frame.setResizable(false);
-
-        update();
-
-        progressBar.setString("Lade Datenbank...");
-
-        JSONObject object = new JSONObject()
-                .put("host", "localhost").put("user", "radio")
-                .put("password", "radio").put("database", "radio_music");
-
-        conf = new DatabaseConfiguration(object);
-        conf.initDatabase();
-
-        progressBar.setString("Lade Dateien...");
-
-        Logger.getLogger("org.jaudiotagger").setLevel(java.util.logging.Level.OFF);
-
-        System.out.print("Bitte Pfad angeben:\n> ");
         Scanner scanner = new Scanner(System.in);
-        String path = scanner.nextLine();
-        scanner.close();
-
-        File f = new File(path);
-
-        new Thread(() -> {
-            String lastHash = "";
-            while (true) {
-                try {
-                    String hash = hashString(f);
-                    progressBar.setString("Waiting for changes");
-                    if (lastHash.equals(hash)) {
-                        System.out.println("Keine Änderungen");
-                        Thread.sleep(1000);
-                    } else {
-                        lastHash = hash;
-                        Thread.sleep(1000);
-                        while (true) {
-                            hash = hashString(f);
-                            if (lastHash.equals(hash)) {
-                                break;
-                            }
-                            lastHash = hash;
-                            progressBar.setIndeterminate(true);
-                            progressBar.setString("Es werden noch Dateien kopiert...");
-                            Thread.sleep(1000);
-                        }
-                        walk(f);
-                    }
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        while (true) {
+            System.out.print("Bitte geben sie die EAN ein:\n> ");
+            String ean = scanner.nextLine();
+            System.out.println("\n\n\nSuche nach " + ean + "...\n\n\n");
+            DiscInformation info = DiscOgsSearch.getInstance().searchBarcode(ean);
+            long start = System.currentTimeMillis();
+            if (info == null) {
+                System.out.println("Keine CD gefunden");
+                continue;
             }
-        }).start();
+            info.loadTracks();
+            System.out.println("Took " + (System.currentTimeMillis() - start) + "ms\n\n\n");
+        }
+
+//        progressBar.setIndeterminate(true);
+//        progressBar.setStringPainted(true);
+//        progressBar.setString("Lade Dateien...");
+//        progressBar.setMaximum(100);
+//        progressBar.setMinimum(0);
+//        progressBar.setVisible(true);
+//
+//        table.setFillsViewportHeight(true);
+//        table.setPreferredSize(new Dimension(800, 100));
+//        table.setVisible(true);
+//
+//        JScrollPane scrollPane = new JScrollPane(table);
+//        scrollPane.setPreferredSize(new Dimension(1600, 900));
+//        scrollPane.setVisible(true);
+//
+//        panel.setPreferredSize(new Dimension(1600, 900));
+//        panel.setLayout(new BorderLayout());
+//        panel.add(progressBar, BorderLayout.NORTH);
+//        panel.add(scrollPane, BorderLayout.CENTER);
+//        panel.setVisible(true);
+//
+//        JFrame frame = new JFrame();
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        frame.add(panel);
+//        frame.pack();
+//        frame.setVisible(true);
+//        frame.setResizable(false);
+//
+//        update();
+//
+//        progressBar.setString("Lade Datenbank...");
+//
+//        JSONObject object = new JSONObject()
+//                .put("host", "localhost").put("user", "radio")
+//                .put("password", "radio").put("database", "radio_music");
+//
+//        conf = new DatabaseConfiguration(object);
+//        conf.initDatabase();
+//
+//        progressBar.setString("Lade Dateien...");
+//
+//        Logger.getLogger("org.jaudiotagger").setLevel(java.util.logging.Level.OFF);
+
+//        System.out.print("Bitte Pfad angeben:\n> ");
+//        Scanner scanner = new Scanner(System.in);
+//        String path = scanner.nextLine();
+//        scanner.close();
+//
+//        File f = new File(path);
+
+
+//        new Thread(() -> {
+//            String lastHash = "";
+//            while (true) {
+//                try {
+//                    String hash = hashString(f);
+//                    progressBar.setString("Waiting for changes");
+//                    if (lastHash.equals(hash)) {
+//                        System.out.println("Keine Änderungen");
+//                        Thread.sleep(1000);
+//                    } else {
+//                        lastHash = hash;
+//                        Thread.sleep(1000);
+//                        while (true) {
+//                            hash = hashString(f);
+//                            if (lastHash.equals(hash)) {
+//                                break;
+//                            }
+//                            lastHash = hash;
+//                            progressBar.setIndeterminate(true);
+//                            progressBar.setString("Es werden noch Dateien kopiert...");
+//                            Thread.sleep(1000);
+//                        }
+//                        walk(f);
+//                    }
+//                } catch (InterruptedException e) {
+//                    throw new RuntimeException(e);
+//                }
+//                try {
+//                    Thread.sleep(1000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }).start();
     }
 
     public void update() {
