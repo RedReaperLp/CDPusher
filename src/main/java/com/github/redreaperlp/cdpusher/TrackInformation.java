@@ -178,6 +178,22 @@ public class TrackInformation {
                 .toLowerCase();
     }
 
+    public JSONObject toJSON() {
+        JSONObject object = new JSONObject();
+        object.put("title", title);
+        object.put("artists", artists);
+        object.put("duration", duration);
+        object.put("imageURL", imageURL);
+        object.put("album", album);
+        object.put("albumReleaseDate", albumReleaseDate);
+        object.put("spotifySearchMissMatch", spotifySearchMissMatch);
+        object.put("missmatchData", missmatchData);
+        object.put("cdNumber", cdNumber);
+        object.put("trackNumber", trackNumber);
+        object.put("internalCDNumeration", internalCDNumeration);
+        return object;
+    }
+
     @Override
     public String toString() {
         return "TrackInformation{" +

@@ -2,6 +2,9 @@ package com.github.redreaperlp.cdpusher;
 
 import com.github.redreaperlp.cdpusher.database.DatabaseConfiguration;
 import com.github.redreaperlp.cdpusher.http.DiscOgsSearch;
+import com.github.redreaperlp.cdpusher.util.FileAccessor;
+import com.github.redreaperlp.cdpusher.util.enums.responses.ContentTypes;
+import io.javalin.Javalin;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.exceptions.CannotReadException;
@@ -9,6 +12,7 @@ import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
+import org.json.JSONObject;
 
 import javax.swing.*;
 import java.io.File;
@@ -26,6 +30,9 @@ public class Main {
     private static Main instance;
     public DatabaseConfiguration conf;
 
+    public boolean colored = true;
+    public boolean debug = true;
+
     public static Main getInstance() {
         return instance;
     }
@@ -42,6 +49,19 @@ public class Main {
     JPanel panel = new JPanel();
 
     public void init() {
+        Javalin app = Javalin.create().start(80);
+        app.get("/", ctx -> ContentTypes.HTML.setContentType(ctx, FileAccessor.html("index.html")));
+        app.get("/api/ean/{ean}", ctx -> {
+            String ean = ctx.pathParam("ean");
+            DiscInformation info = DiscOgsSearch.getInstance().searchBarcode(ean);
+            if (info == null) {
+                ctx.result(new JSONObject().put("error", "No CD found").toString());
+                return;
+            }
+            info.loadTracks();
+            ctx.result(info.toJSON().toString());
+        });
+
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.print("Bitte geben sie die EAN ein:\n> ");

@@ -14,9 +14,7 @@ public class DiscInformation {
     private String[] labels;
     private String resourceURL;
 
-    private JSONArray tracks;
-
-    private List<List<Song>> songs;
+    private List<List<TrackInformation>> songs = new ArrayList<>();
 
     //Todo: fix track with url: example https://open.spotify.com/intl-de/track/4D9cEbNYC8AVSl7d4mLrip?si=a531873bc03647be
     //ID here is 4D9cEbNYC8AVSl7d4mLrip
@@ -40,12 +38,13 @@ public class DiscInformation {
         for (int i = 0; i < tracks.length(); i++) {
             TrackInformation t = new TrackInformation(tracks.getJSONObject(i));
             t.spotifySearch();
+            tracksList.add(t);
             if (t.isSpotifySearchMissMatch() || !t.isSpotifySearch()) {
                 failed++;
                 continue;
             }
-            tracksList.add(t);
         }
+        this.songs.add(tracksList);
         System.out.println("Failed: " + failed + "/" + tracks.length());
     }
 
@@ -69,7 +68,31 @@ public class DiscInformation {
         return resourceURL;
     }
 
-    public List<List<Song>> getSongs() {
+    public List<List<TrackInformation>> getSongs() {
         return songs;
+    }
+
+    public JSONObject toJSON() {
+        JSONObject object = new JSONObject();
+        object.put("country", country);
+        object.put("year", year);
+        object.put("title", title);
+        object.put("labels", labels);
+        object.put("resourceURL", resourceURL);
+
+        JSONArray songs = new JSONArray();
+        for (List<TrackInformation> trackList : this.songs) {
+            for (TrackInformation track : trackList) {
+                songs.put(track.toJSON());
+            }
+        }
+
+        object.put("tracks", new JSONArray(songs));
+        return object;
+    }
+
+    @Override
+    public String toString() {
+        return toJSON().toString();
     }
 }

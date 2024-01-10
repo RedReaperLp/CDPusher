@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div>
+    <input type="number" id="ean_input" placeholder="EAN">
+    <button onclick="fetchEAN(document.getElementById('ean_input').value)" id="ean_button">Search</button>
+</div>
+</body>
+<script>
+
+    function fetchEAN(ean) {
+        fetch('/api/ean/' + ean)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => console.error(error));
+    }
+</script>
+</html>
