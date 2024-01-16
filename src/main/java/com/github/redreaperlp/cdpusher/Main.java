@@ -4,6 +4,7 @@ import com.github.redreaperlp.cdpusher.database.DatabaseConfiguration;
 import com.github.redreaperlp.cdpusher.http.DiscOgsSearch;
 import com.github.redreaperlp.cdpusher.util.FileAccessor;
 import com.github.redreaperlp.cdpusher.util.enums.responses.ContentTypes;
+import com.github.redreaperlp.cdpusher.util.logger.Loggers;
 import io.javalin.Javalin;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
@@ -31,7 +32,7 @@ public class Main {
     public DatabaseConfiguration conf;
 
     public boolean colored = true;
-    public boolean debug = true;
+    public boolean debug = false;
 
     public static Main getInstance() {
         return instance;
@@ -49,33 +50,56 @@ public class Main {
     JPanel panel = new JPanel();
 
     public void init() {
+        Loggers.load();
         Javalin app = Javalin.create().start(80);
         app.get("/", ctx -> ContentTypes.HTML.setContentType(ctx, FileAccessor.html("index.html")));
         app.get("/api/ean/{ean}", ctx -> {
-            String ean = ctx.pathParam("ean");
-            DiscInformation info = DiscOgsSearch.getInstance().searchBarcode(ean);
-            if (info == null) {
-                ctx.result(new JSONObject().put("error", "No CD found").toString());
-                return;
+            try {
+                String ean = ctx.pathParam("ean");
+                DiscInformation info = DiscOgsSearch.getInstance().searchBarcode(ean);
+                if (info == null) {
+                    ctx.result(new JSONObject().put("error", "No CD found").toString());
+                    return;
+                }
+                info.loadTracks();
+                ctx.result(info.toJSON().toString());
+            } catch (Exception e) {
+                ctx.result(new JSONObject().put("error", e.getMessage()).toString());
             }
-            info.loadTracks();
-            ctx.result(info.toJSON().toString());
         });
 
-        Scanner scanner = new Scanner(System.in);
-        while (true) {
-            System.out.print("Bitte geben sie die EAN ein:\n> ");
-            String ean = scanner.nextLine();
-            System.out.println("\n\n\nSuche nach " + ean + "...\n\n\n");
-            DiscInformation info = DiscOgsSearch.getInstance().searchBarcode(ean);
-            long start = System.currentTimeMillis();
-            if (info == null) {
-                System.out.println("Keine CD gefunden");
-                continue;
+        app.get("/assets/*", ctx -> {
+            String path = ctx.path().substring(8);
+            String[] split = path.split("/");
+            System.out.println(path);
+            System.out.println(ctx.path());
+            switch (split[0]) {
+                case "html":
+                    ContentTypes.HTML.setContentType(ctx, FileAccessor.html(path.replaceFirst("html/", "")));
+                    break;
+                case "css":
+                    ContentTypes.CSS.setContentType(ctx, FileAccessor.css(path.replaceFirst("css/", "")));
+                    break;
+                case "js":
+                    ContentTypes.JAVASCRIPT.setContentType(ctx, FileAccessor.js(path.replaceFirst("js/", "")));
+                    break;
             }
-            info.loadTracks();
-            System.out.println("Took " + (System.currentTimeMillis() - start) + "ms\n\n\n");
-        }
+        });
+
+//        Scanner scanner = new Scanner(System.in);
+//        while (true) {
+//            System.out.print("Bitte geben sie die EAN ein:\n> ");
+//            String ean = scanner.nextLine();
+//            System.out.println("\n\n\nSuche nach " + ean + "...\n\n\n");
+//            DiscInformation info = DiscOgsSearch.getInstance().searchBarcode(ean);
+//            long start = System.currentTimeMillis();
+//            if (info == null) {
+//                System.out.println("Keine CD gefunden");
+//                continue;
+//            }
+//            info.loadTracks();
+//            System.out.println("Took " + (System.currentTimeMillis() - start) + "ms\n\n\n");
+//        }
 
 //        progressBar.setIndeterminate(true);
 //        progressBar.setStringPainted(true);
@@ -99,6 +123,7 @@ public class Main {
 //        panel.setVisible(true);
 //
 //        JFrame frame = new JFrame();
+//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //        frame.add(panel);
 //        frame.pack();

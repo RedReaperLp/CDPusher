@@ -1,6 +1,7 @@
 package com.github.redreaperlp.cdpusher;
 
 import com.github.redreaperlp.cdpusher.http.SpotifySearch;
+import com.github.redreaperlp.cdpusher.util.logger.types.TestPrinter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -178,12 +179,14 @@ public class TrackInformation {
                 .toLowerCase();
     }
 
+
     public JSONObject toJSON() {
         JSONObject object = new JSONObject();
-        object.put("title", title);
-        object.put("artists", artists);
+
+        object.put("title", title == null ? JSONObject.NULL : title);
+        object.put("artists", artists == null ? JSONObject.NULL : artists);
         object.put("duration", duration);
-        object.put("imageURL", imageURL);
+        object.put("imageURL", imageURL == null ? JSONObject.NULL : imageURL);
         object.put("album", album);
         object.put("albumReleaseDate", albumReleaseDate);
         object.put("spotifySearchMissMatch", spotifySearchMissMatch);
@@ -191,6 +194,8 @@ public class TrackInformation {
         object.put("cdNumber", cdNumber);
         object.put("trackNumber", trackNumber);
         object.put("internalCDNumeration", internalCDNumeration);
+
+        new TestPrinter().append(object.toString(5)).print();
         return object;
     }
 

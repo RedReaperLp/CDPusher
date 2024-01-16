@@ -16,6 +16,11 @@ public class Loggers {
         Logger javalinlogger = (Logger) LoggerFactory.getLogger("io.javalin");
         javalinlogger.addAppender(new ColorLoggerFactory());
         javalinlogger.getAppender("ColorLogger").start();
+
+        Logger eclipseLogger = (Logger) LoggerFactory.getLogger("org.eclipse.jetty");
+        eclipseLogger.addAppender(new ColorLoggerFactory());
+        eclipseLogger.getAppender("ColorLogger").start();
         new SuccessPrinter().append("Loggers loaded").print();
+
     }
 }

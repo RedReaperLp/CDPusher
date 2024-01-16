@@ -20,7 +20,7 @@ public class PlainPrinter implements ColorLogger {
     public PlainPrinter(MessagePart prefix) {
         this.prefix = prefix;
         this.prefix.toLength(8);
-        this.sender = new MessagePart("[DragonSoft]", Color.INVERT_DARK_GREEN);
+        this.sender = new MessagePart("[CDPusher]", Color.INVERT_DARK_GREEN);
     }
 
     @Override
