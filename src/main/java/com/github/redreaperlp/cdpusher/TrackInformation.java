@@ -1,7 +1,6 @@
 package com.github.redreaperlp.cdpusher;
 
 import com.github.redreaperlp.cdpusher.http.SpotifySearch;
-import com.github.redreaperlp.cdpusher.util.logger.types.TestPrinter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -12,11 +11,11 @@ public class TrackInformation {
     private String title;
     private int duration;
     private String[] artists;
-    private String imageURL;
+    private String cover;
     private String album;
     private String albumReleaseDate;
 
-    private int cdNumber;
+    private int cdNumber = 1;
     private int trackNumber;
 
     private boolean spotifySearch = false;
@@ -27,8 +26,6 @@ public class TrackInformation {
 
     public TrackInformation(JSONObject jsonObject) {
         setTitle(jsonObject.getString("title"));
-        System.out.println(jsonObject.toString(5));
-
 
         JSONArray artists;
         if (jsonObject.has("artists")) {
@@ -47,8 +44,12 @@ public class TrackInformation {
         }
         try {
             String[] position = jsonObject.getString("position").split("-");
-            this.cdNumber = Integer.parseInt(position[0]);
-            if (position.length > 1) this.trackNumber = Integer.parseInt(position[1]);
+            if (position.length > 1) {
+                this.cdNumber = Integer.parseInt(position[0]);
+                this.trackNumber = Integer.parseInt(position[1]);
+            } else if (position.length == 1) {
+                this.trackNumber = Integer.parseInt(position[0]);
+            }
         } catch (NumberFormatException e) {
             this.cdNumber = -1;
             this.trackNumber = -1;
@@ -64,7 +65,7 @@ public class TrackInformation {
     }
 
     public String getImage() {
-        return imageURL;
+        return cover;
     }
 
     public int getCdNumber() {
@@ -89,8 +90,8 @@ public class TrackInformation {
         this.title = title.replaceAll(regex, "").trim();
     }
 
-    public void setImageURL(String imageURL) {
-        this.imageURL = imageURL;
+    public void setCover(String cover) {
+        this.cover = cover;
     }
 
     public void setArtists(JSONArray artists) {
@@ -133,19 +134,19 @@ public class TrackInformation {
         int duration = track.getInt("duration_ms") / 1000;
         String albumName = album.getString("name");
         String albumReleaseDate = album.getString("release_date");
-        String imageURL = album.getJSONArray("images").getJSONObject(0).getString("url");
+        String cover = album.getJSONArray("images").getJSONObject(0).getString("url");
 
         if (!titlesMatch(title, this.title)) {
             spotifySearchMissMatch = true;
             System.out.println("\n\t\t\t\tTitle mismatch: " + title.trim() + " != " + this.title.trim());
-            missmatchData = new MissmatchData(title, artists, duration, imageURL, albumName, albumReleaseDate);
+            missmatchData = new MissmatchData(title, artists, duration, cover, albumName, albumReleaseDate);
 
             System.out.println("\n\n" + this.toString());
             System.out.println(missmatchData.toString() + "\n\n");
         } else {
             this.artists = artists;
             this.duration = duration;
-            this.imageURL = imageURL;
+            this.cover = cover;
             this.album = albumName;
             this.albumReleaseDate = albumReleaseDate;
         }
@@ -186,16 +187,16 @@ public class TrackInformation {
         object.put("title", title == null ? JSONObject.NULL : title);
         object.put("artists", artists == null ? JSONObject.NULL : artists);
         object.put("duration", duration);
-        object.put("imageURL", imageURL == null ? JSONObject.NULL : imageURL);
+        object.put("cover", cover == null ? JSONObject.NULL : cover);
         object.put("album", album);
         object.put("albumReleaseDate", albumReleaseDate);
         object.put("spotifySearchMissMatch", spotifySearchMissMatch);
+        object.put("spotifySearch", spotifySearch);
         object.put("missmatchData", missmatchData);
         object.put("cdNumber", cdNumber);
         object.put("trackNumber", trackNumber);
         object.put("internalCDNumeration", internalCDNumeration);
 
-        new TestPrinter().append(object.toString(5)).print();
         return object;
     }
 
@@ -208,7 +209,7 @@ public class TrackInformation {
                 ", cdNumber=" + cdNumber +
                 ", trackNumber=" + trackNumber +
                 ", internalCDNumeration=" + internalCDNumeration +
-                ", imageURL='" + imageURL + '\'' +
+                ", imageURL='" + cover + '\'' +
                 ", album='" + album + '\'' +
                 ", albumReleaseDate='" + albumReleaseDate + '\'' +
                 "}";

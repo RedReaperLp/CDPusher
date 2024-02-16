@@ -1,22 +1,26 @@
 import fetchEAN from "../../Fetching.jsx";
 
-function LeftBAR() {
+function LeftBAR({storage}) {
     function evalueate(props) {
         if (event.key === "Enter") {
-            fetchEAN(props.target.value);
+            fetchEAN(props.target.value).then((data) => {
+                storage.songs.set(data);
+            })
         }
     }
 
     return (
         <div className="left-bar">
-            <div className="left-bar__logo centering40" style={{
+            <div className="left-bar__logo" style={{
                 paddingRight: "10px",
+                height: "40px",
+                width: "40px",
             }}>
                 <img height={"40px"} width={"40px"} src={"https://www.svgrepo.com/show/880/compact-disc.svg"}
                      alt="logo"/>
             </div>
-            <div className="left-bar__search centering40">
-                <input onKeyDown={(props) => evalueate(props)} type="text" placeholder="Search"/>
+            <div className="left-bar__search">
+                <input onKeyDown={(props) => evalueate(props)} type="text" placeholder="Enter EAN"/>
             </div>
         </div>
     );

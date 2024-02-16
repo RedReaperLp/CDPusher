@@ -1,4 +1,4 @@
-package org.agrardragon.util.enums.responses;
+package com.github.redreaperlp.cdpusher.util.enums.responses;
 
 import io.javalin.http.Context;
 

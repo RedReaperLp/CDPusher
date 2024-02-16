@@ -1,0 +1,61 @@
+.content {
+  grid-area: content;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+
+  .song {
+    display: grid;
+    grid-template-columns: 40% 30% 30%;
+    grid-template-rows: 100%;
+    grid-template-areas: "title__cover song__artist song__album";
+    background: rgba(0, 0, 0, 0.2);
+    margin: 10px;
+    border-radius: 10px;
+
+    .title__cover {
+      grid-area: title__cover;
+      display: flex;
+      justify-content: start;
+      align-items: center;
+      padding: 10px;
+
+
+      .song__cover {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+      }
+
+      .song__title {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+      }
+    }
+
+    .song__artist {
+      grid-area: song__artist;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+    }
+
+    .song__album {
+      grid-area: song__album;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+    }
+  }
+
+  .song__missmatch {
+    background: rgba(255, 0, 0, 0.5);
+  }
+}
+
