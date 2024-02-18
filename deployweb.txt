@@ -1,0 +1,11 @@
+echo CDing to /root/CDPusher
+echo
+cd /root/CDPusher
+cd soundfetcher
+echo "Building project with Vite in soundfetcher folder..."
+npx vite build
+cd ..
+echo "Build process completed."
+echo "Copying build files to public folder..."
+yes | cp -rf soundfetcher/dist/assets/index.js assets/js/SoundFetcher.js
+yes | cp -rf soundfetcher/dist/assets/index.css assets/css/SoundFetcher.css

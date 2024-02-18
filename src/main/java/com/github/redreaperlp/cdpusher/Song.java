@@ -1,114 +1,38 @@
 package com.github.redreaperlp.cdpusher;
 
-import org.jaudiotagger.tag.FieldKey;
-import org.jaudiotagger.tag.Tag;
+import com.github.redreaperlp.cdpusher.data.DataKeys;
+import com.github.redreaperlp.cdpusher.data.SongData;
+import org.json.JSONObject;
 
 import javax.swing.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class Song {
+public class Song implements SongData {
+    private final long songID;
+    private String title;
+    private String artist;
+    private String album;
+    private int trackNo;
+    private int year;
+    private int discNo;
+    private long timeInSeconds;
+    private long internalDiscNo;
+    private String imageURI;
 
-    String title;
-    String artist;
-    String album;
-    String track;
-    String year;
-    String genre;
-    String comment;
-    String composer;
-    String discNo;
-    long timeInSeconds;
-
-    public Song(Tag tag, long timeInSeconds) {
-        this.title = tag.getFirst(FieldKey.TITLE);
-        this.artist = tag.getFirst(FieldKey.ARTIST);
-        this.album = tag.getFirst(FieldKey.ALBUM);
-        this.track = tag.getFirst(FieldKey.TRACK);
-        System.out.println(tag.getFirst(FieldKey.COVER_ART ));
-        this.year = tag.getFirst(FieldKey.YEAR);
-        this.genre = tag.getFirst(FieldKey.GENRE);
-        this.comment = tag.getFirst(FieldKey.COMMENT);
-        this.composer = tag.getFirst(FieldKey.COMPOSER);
-        this.discNo = tag.getFirst(FieldKey.DISC_NO);
-        this.timeInSeconds = timeInSeconds;
-
-        Pattern pattern = Pattern.compile("\\(.*\\)");
-        Matcher matcher = pattern.matcher(genre);
-        if (matcher.find()) {
-            genre = genre.replace(matcher.group(0), "");
-        }
-        genre = genre.trim();
-        System.out.println(genre);
-
-        if (album.toLowerCase().contains("unbekannt") || album.toLowerCase().contains("unknown")) {
-            album = "Unbekannt";
-        }
-
-        if (genre.toLowerCase().contains("unbekannt") || genre.toLowerCase().contains("unknown")) {
-            genre = "Unbekannt";
-        }
-        if (composer.isEmpty()) {
-            composer = "Unbekannt";
-        }
-    }
-
-    public Song(String title, String interpreter, String album, String track, String year, String genre, String comment, String composer, String discNo, String length) {
-        this.title = title;
-        this.artist = interpreter;
-        this.album = album;
-        this.track = track;
-        this.year = year;
-        this.genre = genre;
-        this.comment = comment;
-        this.composer = composer;
+    public Song(long songID, String title, String artist, String album, int trackNo, int discNo, long duration, int year, long internalDiscNo, String imageURI) {
+        this.internalDiscNo = internalDiscNo;
+        this.timeInSeconds = duration;
+        this.imageURI = imageURI;
+        this.trackNo = trackNo;
+        this.songID = songID;
         this.discNo = discNo;
-        this.timeInSeconds = Long.parseLong(length);
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getArtist() {
-        return artist;
-    }
-
-    public String getAlbum() {
-        return album;
-    }
-
-    public String getTrack() {
-        return track;
-    }
-
-    public String getYear() {
-        return year;
-    }
-
-    public String getGenre() {
-        return genre;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public String getComposer() {
-        return composer;
-    }
-
-    public String getDiscNo() {
-        return discNo;
-    }
-
-    public long getTimeInSeconds() {
-        return timeInSeconds;
+        this.album = album;
+        this.artist = artist;
+        this.year = year;
+        this.title = title;
     }
 
     @Override
@@ -117,13 +41,11 @@ public class Song {
                 "title='" + title + '\'' +
                 ", artist='" + artist + '\'' +
                 ", album='" + album + '\'' +
-                ", track='" + track + '\'' +
-                ", year='" + year + '\'' +
-                ", genre='" + genre + '\'' +
-                ", comment='" + comment + '\'' +
-                ", composer='" + composer + '\'' +
-                ", discNo='" + discNo + '\'' +
+                ", track=" + trackNo +
+                ", year=" + year +
+                ", discNo=" + discNo +
                 ", timeInSeconds=" + timeInSeconds +
+                ", internalDiscNo=" + internalDiscNo +
                 '}';
     }
 
@@ -140,11 +62,8 @@ public class Song {
 
     private void updateDB(Connection connection) {
         try {
-            String updateQuery = "UPDATE radio_music.music SET title = ?, artist = ?, album = ?, track = ?, year = ?, genre = ?, comment = ?, composer = ?, length = ? WHERE title = ? AND artist = ? AND year = ?";
+            String updateQuery = "UPDATE cd_pusher.music SET title = ?, artist = ?, album = ?, track = ?,discNo=?, year = ?, duration = ?, image = ?, internalDiscNo = ? WHERE id = ?";
             try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
-                stmt.setString(10, title);
-                stmt.setString(11, artist);
-                stmt.setInt(12, year.isEmpty() ? 0 : Integer.parseInt(year));
                 setParameters(stmt);
                 stmt.execute();
             }
@@ -155,8 +74,7 @@ public class Song {
 
     private void insertIntoDB(Connection connection) {
         try {
-            String insertQuery = "INSERT INTO radio_music.music (title, artist, album, track, year, genre, comment, composer, length) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            try (PreparedStatement stmt = connection.prepareStatement(insertQuery)) {
+            try (PreparedStatement stmt = connection.prepareStatement("INSERT INTO cd_pusher.music (track, artist, album, track, discNo, year, duration, image, internalDiscNo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
                 setParameters(stmt);
                 stmt.execute();
             }
@@ -169,21 +87,21 @@ public class Song {
         stmt.setString(1, title);
         stmt.setString(2, artist);
         stmt.setString(3, album);
-        stmt.setString(4, track);
-        stmt.setInt(5, year.isEmpty() ? 0 : Integer.parseInt(year));
-        stmt.setString(6, genre);
-        stmt.setString(7, comment);
-        stmt.setString(8, composer);
-        stmt.setLong(9, timeInSeconds);
+        stmt.setInt(4, trackNo);
+        stmt.setInt(5, discNo);
+        stmt.setInt(6, year);
+        stmt.setLong(7, timeInSeconds);
+        stmt.setString(8, imageURI);
+        stmt.setLong(9, internalDiscNo);
     }
 
 
     public boolean existsInDB(Connection connection) {
         try {
-            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM radio_music.music WHERE title = ? AND artist = ? AND year = ?");
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM cd_pusher.music WHERE title = ? AND artist = ? AND year = ?");
             stmt.setString(1, title);
             stmt.setString(2, artist);
-            stmt.setInt(3, year.isEmpty() ? 0 : Integer.parseInt(year));
+            stmt.setInt(3, year);
             stmt.execute();
             ResultSet resultSet = stmt.getResultSet();
             if (resultSet.next()) {
@@ -195,7 +113,39 @@ public class Song {
         }
     }
 
-    public List<String> toArray() {
-        return List.of(title, artist, album, track, year, genre, comment, composer, discNo, String.valueOf(timeInSeconds));
+    @Override
+    public int getDiscNo() {
+        return discNo;
+    }
+
+    @Override
+    public int getTrackNo() {
+        return trackNo;
+    }
+
+    @Override
+    public long getSongID() {
+        return songID;
+    }
+
+    public JSONObject toJSON() {
+        return new JSONObject()
+                .put(DataKeys.SongData.TITLE.getKey(), title)
+                .put(DataKeys.SongData.ARTIST.getKey(), artist)
+                .put(DataKeys.SongData.ALBUM.getKey(), album)
+                .put(DataKeys.SongData.TRACK_NO.getKey(), trackNo)
+                .put(DataKeys.SongData.YEAR.getKey(), year)
+                .put(DataKeys.SongData.DISC_NO.getKey(), discNo)
+                .put(DataKeys.SongData.DURATION.getKey(), timeInSeconds)
+                .put(DataKeys.SongData.COVER_URI.getKey(), imageURI)
+                .put(DataKeys.SongData.INTERNAL_DISC_NO.getKey(), internalDiscNo)
+                .put(DataKeys.SongData.SPOTIFY_SEARCH.getKey(), true)
+                .put(DataKeys.SongData.SPOTIFY_MISSMATCH.getKey(), false)
+                .put(DataKeys.SongData.TRACK_ID.getKey(), songID);
+    }
+
+    public void setIDs(int trackNo, int discNo) {
+        this.trackNo = trackNo;
+        this.discNo = discNo;
     }
 }

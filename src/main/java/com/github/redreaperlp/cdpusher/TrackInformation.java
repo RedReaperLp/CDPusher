@@ -1,5 +1,7 @@
 package com.github.redreaperlp.cdpusher;
 
+import com.github.redreaperlp.cdpusher.data.DataKeys;
+import com.github.redreaperlp.cdpusher.data.SongData;
 import com.github.redreaperlp.cdpusher.http.SpotifySearch;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -7,24 +9,25 @@ import org.json.JSONObject;
 import java.text.Normalizer;
 import java.util.Arrays;
 
-public class TrackInformation {
+public class TrackInformation implements SongData {
+    private long songID;
     private String title;
-    private int duration;
-    private String[] artists;
-    private String cover;
     private String album;
+    private int discNo = 1;
+    private int trackNo;
+    private int duration;
+    private String cover;
+    private String[] artists;
     private String albumReleaseDate;
-
-    private int cdNumber = 1;
-    private int trackNumber;
-
     private boolean spotifySearch = false;
-    private boolean spotifySearchMissMatch = false;
     private MissmatchData missmatchData;
+    private boolean spotifySearchMissMatch = false;
 
-    private int internalCDNumeration;
+    private int internalCDNumeration = 1;
 
-    public TrackInformation(JSONObject jsonObject) {
+
+    public TrackInformation(long songID, JSONObject jsonObject) {
+        this.songID = songID;
         setTitle(jsonObject.getString("title"));
 
         JSONArray artists;
@@ -45,14 +48,14 @@ public class TrackInformation {
         try {
             String[] position = jsonObject.getString("position").split("-");
             if (position.length > 1) {
-                this.cdNumber = Integer.parseInt(position[0]);
-                this.trackNumber = Integer.parseInt(position[1]);
+                this.discNo = Integer.parseInt(position[0]);
+                this.trackNo = Integer.parseInt(position[1]);
             } else if (position.length == 1) {
-                this.trackNumber = Integer.parseInt(position[0]);
+                this.trackNo = Integer.parseInt(position[0]);
             }
         } catch (NumberFormatException e) {
-            this.cdNumber = -1;
-            this.trackNumber = -1;
+            this.discNo = -1;
+            this.trackNo = -1;
         }
     }
 
@@ -68,12 +71,17 @@ public class TrackInformation {
         return cover;
     }
 
-    public int getCdNumber() {
-        return cdNumber;
+    public int getDiscNo() {
+        return discNo;
     }
 
-    public int getTrackNumber() {
-        return trackNumber;
+    public int getTrackNo() {
+        return trackNo;
+    }
+
+    @Override
+    public long getSongID() {
+        return songID;
     }
 
     public int getInternalCDNumeration() {
@@ -113,17 +121,14 @@ public class TrackInformation {
         this.albumReleaseDate = albumReleaseDate;
     }
 
-    public void spotifySearch() {
+    public SongData spotifySearch() {
         if (!spotifySearch) {
             System.out.println("Suche kann nicht durchgeführt werden, da keine Künstler angegeben sind.");
-            return;
+            return this;
         }
 
         JSONObject track = SpotifySearch.getInstance().finalizeSearch(this).getJSONArray("items").getJSONObject(0);
-        track.remove("available_markets");
-
         JSONObject album = track.getJSONObject("album");
-        album.remove("available_markets");
 
         String title = Normalizer.normalize(track.getString("name"), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "").trim().toLowerCase();
         String[] artists = new String[track.getJSONArray("artists").length()];
@@ -138,17 +143,24 @@ public class TrackInformation {
 
         if (!titlesMatch(title, this.title)) {
             spotifySearchMissMatch = true;
-            System.out.println("\n\t\t\t\tTitle mismatch: " + title.trim() + " != " + this.title.trim());
-            missmatchData = new MissmatchData(title, artists, duration, cover, albumName, albumReleaseDate);
-
-            System.out.println("\n\n" + this.toString());
-            System.out.println(missmatchData.toString() + "\n\n");
+            missmatchData = new MissmatchData(songID, title, artists, duration, cover, albumName, albumReleaseDate, discNo, this.trackNo, internalCDNumeration);
+            return this;
         } else {
             this.artists = artists;
             this.duration = duration;
             this.cover = cover;
             this.album = albumName;
             this.albumReleaseDate = albumReleaseDate;
+            return new Song(this.songID,
+                    this.title,
+                    this.artists[0],
+                    this.album,
+                    this.trackNo,
+                    this.discNo,
+                    this.duration,
+                    Integer.parseInt(this.albumReleaseDate.split("-")[0]),
+                    this.internalCDNumeration,
+                    this.cover);
         }
     }
 
@@ -184,18 +196,19 @@ public class TrackInformation {
     public JSONObject toJSON() {
         JSONObject object = new JSONObject();
 
-        object.put("title", title == null ? JSONObject.NULL : title);
-        object.put("artists", artists == null ? JSONObject.NULL : artists);
-        object.put("duration", duration);
-        object.put("cover", cover == null ? JSONObject.NULL : cover);
-        object.put("album", album);
-        object.put("albumReleaseDate", albumReleaseDate);
-        object.put("spotifySearchMissMatch", spotifySearchMissMatch);
-        object.put("spotifySearch", spotifySearch);
-        object.put("missmatchData", missmatchData);
-        object.put("cdNumber", cdNumber);
-        object.put("trackNumber", trackNumber);
-        object.put("internalCDNumeration", internalCDNumeration);
+        object.put(DataKeys.SongData.TITLE.getKey(), title == null ? JSONObject.NULL : title);
+        object.put(DataKeys.SongData.ARTIST.getKey(), artists == null ? JSONObject.NULL : artists);
+        object.put(DataKeys.SongData.DURATION.getKey(), duration);
+        object.put(DataKeys.SongData.COVER_URI.getKey(), cover == null ? JSONObject.NULL : cover);
+        object.put(DataKeys.SongData.ALBUM.name(), album);
+        object.put(DataKeys.SongData.YEAR.getKey(), albumReleaseDate);
+        object.put(DataKeys.SongData.SPOTIFY_MISSMATCH.getKey(), spotifySearchMissMatch);
+        object.put(DataKeys.SongData.SPOTIFY_SEARCH.getKey(), spotifySearch);
+        object.put(DataKeys.SongData.SPOTIFY_MISSMATCH_DATA.getKey(), missmatchData);
+        object.put(DataKeys.SongData.DISC_NO.getKey(), discNo);
+        object.put(DataKeys.SongData.TRACK_NO.getKey(), trackNo);
+        object.put(DataKeys.SongData.INTERNAL_DISC_NO.getKey(), internalCDNumeration);
+        object.put(DataKeys.SongData.TRACK_ID.getKey(), songID);
 
         return object;
     }
@@ -206,8 +219,8 @@ public class TrackInformation {
                 "title='" + title + '\'' +
                 ", artists=" + (artists == null ? null : Arrays.asList(artists)) +
                 ", duration=" + duration +
-                ", cdNumber=" + cdNumber +
-                ", trackNumber=" + trackNumber +
+                ", cdNumber=" + discNo +
+                ", trackNumber=" + trackNo +
                 ", internalCDNumeration=" + internalCDNumeration +
                 ", imageURL='" + cover + '\'' +
                 ", album='" + album + '\'' +
@@ -215,20 +228,25 @@ public class TrackInformation {
                 "}";
     }
 
-    public class MissmatchData {
+    public static class MissmatchData implements SongData {
+        private long songID;
         private String title;
-        private String[] artists;
+        private int discNo;
+        private int trackNo;
         private int duration;
-        private String imageURL;
         private String album;
+        private String[] artists;
+        private String imageURL;
+        private int internalDiscNo;
         private String albumReleaseDate;
 
-        public MissmatchData(String title, String[] artists, int duration, String imageURL, String album, String albumReleaseDate) {
+        public MissmatchData(long songID, String title, String[] artists, int duration, String imageURL, String album, String albumReleaseDate, int discNo, int trackNo, int internalDiscNo) {
             this.title = title;
+            this.album = album;
             this.artists = artists;
+            this.songID = songID;
             this.duration = duration;
             this.imageURL = imageURL;
-            this.album = album;
             this.albumReleaseDate = albumReleaseDate;
         }
 
@@ -281,6 +299,21 @@ public class TrackInformation {
         }
 
         @Override
+        public int getDiscNo() {
+            return discNo;
+        }
+
+        @Override
+        public int getTrackNo() {
+            return trackNo;
+        }
+
+        @Override
+        public long getSongID() {
+            return songID;
+        }
+
+        @Override
         public String toString() {
             return "MissmatchData{" +
                     "title='" + title + '\'' +
@@ -290,6 +323,21 @@ public class TrackInformation {
                     ", album='" + album + '\'' +
                     ", albumReleaseDate='" + albumReleaseDate + '\'' +
                     '}';
+        }
+
+        @Override
+        public JSONObject toJSON() {
+            JSONObject object = new JSONObject();
+
+            object.put(DataKeys.SongData.TITLE.getKey(), title);
+            object.put(DataKeys.SongData.ARTIST.getKey(), artists);
+            object.put(DataKeys.SongData.DURATION.getKey(), duration);
+            object.put(DataKeys.SongData.COVER_URI.getKey(), imageURL);
+            object.put(DataKeys.SongData.ALBUM.name(), album);
+            object.put(DataKeys.SongData.YEAR.getKey(), albumReleaseDate);
+            object.put(DataKeys.SongData.DISC_NO.getKey(), discNo);
+
+            return object;
         }
     }
 }

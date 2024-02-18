@@ -11,12 +11,12 @@ import java.net.URISyntaxException;
 import java.net.http.HttpRequest;
 
 public class DiscOgsSearch {
-    private String consumerKey = "nlWRgBrgZnFeOuwDqXbu";
-    private String consumerSecret = "HxyzwBoNWUhcZeZLsvqFHVTrYoaVkQhN";
+    private final String consumerKey = "nlWRgBrgZnFeOuwDqXbu";
+    private final String consumerSecret = "HxyzwBoNWUhcZeZLsvqFHVTrYoaVkQhN";
 
-    private String tokenURL = "https://api.discogs.com/oauth/request_token=oauth_callback=http://localhost:8080";
-    private String accessTokenURL = "https://api.discogs.com/oauth/access_token";
-    private String authorizeURL = "https://www.discogs.com/oauth/authorize";
+    private final String tokenURL = "https://api.discogs.com/oauth/request_token=oauth_callback=http://localhost:8080";
+    private final String accessTokenURL = "https://api.discogs.com/oauth/access_token";
+    private final String authorizeURL = "https://www.discogs.com/oauth/authorize";
 
 
     private static DiscOgsSearch instance;
@@ -35,13 +35,11 @@ public class DiscOgsSearch {
      * @param barcode the barcode to search for
      * @return the first result or null if no result was found
      */
-    public DiscInformation searchBarcode(String barcode) {
+    public DiscInformation searchEan(String barcode) {
         String requestURL = String.format("https://api.discogs.com/database/search?q=%s&key=%s&secret=%s", barcode, consumerKey, consumerSecret);
         try {
             HttpRequest request = HttpRequest.newBuilder(new URI(requestURL)).GET().build();
-            JSONArray resJSON = new JSONObject(
-                    CliManager.send(request)
-            ).getJSONArray("results");
+            JSONArray resJSON = new JSONObject(CliManager.send(request)).getJSONArray("results");
             if (resJSON.isEmpty()) {
                 return null;
             }

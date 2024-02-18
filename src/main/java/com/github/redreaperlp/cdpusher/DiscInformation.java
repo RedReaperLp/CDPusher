@@ -1,6 +1,8 @@
 package com.github.redreaperlp.cdpusher;
 
+import com.github.redreaperlp.cdpusher.database.DatabaseManager;
 import com.github.redreaperlp.cdpusher.http.DiscOgsSearch;
+import com.github.redreaperlp.cdpusher.user.User;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -14,10 +16,10 @@ public class DiscInformation {
     private String[] labels;
     private String resourceURL;
 
-    private List<List<TrackInformation>> songs = new ArrayList<>();
+    private long trackidCounter = DatabaseManager.getInstance().getHighestID();
 
-    //Todo: fix track with url: example https://open.spotify.com/intl-de/track/4D9cEbNYC8AVSl7d4mLrip?si=a531873bc03647be
-    //ID here is 4D9cEbNYC8AVSl7d4mLrip
+    private final List<List<TrackInformation>> songs = new ArrayList<>();
+
     public DiscInformation(JSONObject requestResponse) {
         if (requestResponse.has("country")) this.country = requestResponse.getString("country");
         if (requestResponse.has("year")) this.year = requestResponse.getString("year");
@@ -27,25 +29,17 @@ public class DiscInformation {
         if (requestResponse.has("resource_url")) this.resourceURL = requestResponse.getString("resource_url");
     }
 
-    public void loadTracks() {
+    public void loadTracks(User requester) {
         int failed = 0;
         JSONArray tracks = DiscOgsSearch.getInstance().searchDiscTracks(this);
-        List<TrackInformation> tracksList = new ArrayList<>();
         if (tracks == null) {
             System.out.println("Failed to load tracks");
             return;
         }
         for (int i = 0; i < tracks.length(); i++) {
-            TrackInformation t = new TrackInformation(tracks.getJSONObject(i));
-            t.spotifySearch();
-            tracksList.add(t);
-            if (t.isSpotifySearchMissMatch() || !t.isSpotifySearch()) {
-                failed++;
-                continue;
-            }
+            TrackInformation t = new TrackInformation(trackidCounter++, tracks.getJSONObject(i));
+            requester.addSong(t.spotifySearch());
         }
-        this.songs.add(tracksList);
-        System.out.println("Failed: " + failed + "/" + tracks.length());
     }
 
     public String getCountry() {

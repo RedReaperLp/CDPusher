@@ -19,6 +19,13 @@ public class DatabaseConfiguration {
         this.database = json.getString("database");
     }
 
+    public DatabaseConfiguration(String host, String user, String password, String database) {
+        this.host = host;
+        this.user = user;
+        this.password = password;
+        this.database = database;
+    }
+
     public String getHost() {
         return host;
     }

@@ -14,29 +14,6 @@
     margin: 10px;
     border-radius: 10px;
 
-    .title__cover {
-      grid-area: title__cover;
-      display: flex;
-      justify-content: start;
-      align-items: center;
-      padding: 10px;
-
-
-      .song__cover {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 10px;
-      }
-
-      .song__title {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 10px;
-      }
-    }
-
     .song__artist {
       grid-area: song__artist;
       display: flex;
@@ -59,3 +36,25 @@
   }
 }
 
+.title__cover {
+  grid-area: title__cover;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  padding: 10px;
+
+
+  .song__cover {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+  }
+
+  .song__title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+  }
+}

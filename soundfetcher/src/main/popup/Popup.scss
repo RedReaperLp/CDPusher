@@ -1,0 +1,83 @@
+.popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+  width: 80%;
+  height: 80%;
+  border-radius: 50px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+
+  .popup__content {
+    display: grid;
+
+    height: 90%;
+    width: 90%;
+    margin: 5%;
+
+    grid-template-columns: 40% 30% 30%;
+    grid-template-rows: 20% 20% 20% 20%;
+    grid-template-areas: "title__cover artist album"
+                         "track-number duration release-date"
+                         "spotify content internal-cd-id"
+                            "patch patch patch";
+
+    .title__cover {
+      grid-area: title__cover;
+    }
+
+    .song__cover {
+      margin-right: 10px;
+    }
+
+    .item {
+      display: flex;
+      flex-direction: column;
+      justify-content: start;
+      align-items: start;
+      padding: 10px;
+
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      margin: 5px;
+
+      .header__title {
+        margin-bottom: 10px;
+        font-size: 1.2rem;
+      }
+    }
+
+    .left-flex {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
+
+    .inline-item {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+
+      .header__title {
+        margin-bottom: 10px;
+      }
+
+      .internal-cd-id {
+        grid-area: internal-cd-id;
+      }
+
+      .duration {
+        grid-area: duration;
+      }
+
+      .spotify {
+        grid-area: spotify;
+      }
+    }
+  }
+}

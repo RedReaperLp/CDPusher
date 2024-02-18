@@ -16,7 +16,7 @@ repositories {
 dependencies {
     implementation("io.javalin", "javalin", "5.6.3")
     implementation("org.json", "json", "20231013")
-    implementation("com.zaxxer","HikariCP", "5.1.0")
+    implementation("com.zaxxer", "HikariCP", "5.1.0")
     implementation("mysql", "mysql-connector-java", "8.0.33")
     implementation("org.slf4j", "slf4j-simple", "1.7.30")
     implementation("org.slf4j", "slf4j-api", "1.7.30")

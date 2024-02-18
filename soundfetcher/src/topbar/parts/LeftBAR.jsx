@@ -1,11 +1,10 @@
-import fetchEAN from "../../Fetching.jsx";
-
 function LeftBAR({storage}) {
     function evalueate(props) {
         if (event.key === "Enter") {
-            fetchEAN(props.target.value).then((data) => {
-                storage.songs.set(data);
-            })
+            storage.webSocket.send({
+                request: "search",
+                ean: props.target.value
+            });
         }
     }
 
