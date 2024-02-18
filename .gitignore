@@ -40,3 +40,8 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+Deploy.bat
+deploy.txt
+DeployWeb.bat
+deployweb.txt
+start.sh
