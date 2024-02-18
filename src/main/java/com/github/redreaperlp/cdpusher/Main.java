@@ -3,6 +3,7 @@ package com.github.redreaperlp.cdpusher;
 import com.github.redreaperlp.cdpusher.database.DatabaseConfiguration;
 import com.github.redreaperlp.cdpusher.http.DiscOgsSearch;
 import com.github.redreaperlp.cdpusher.util.FileAccessor;
+import com.github.redreaperlp.cdpusher.util.enums.responses.CacheControl;
 import com.github.redreaperlp.cdpusher.util.enums.responses.ContentTypes;
 import com.github.redreaperlp.cdpusher.util.logger.Loggers;
 import io.javalin.Javalin;
@@ -23,6 +24,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -51,11 +53,17 @@ public class Main {
 
     public void init() {
         Loggers.load();
+        System.out.println("Starting CD Pusher");
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         Javalin app = Javalin.create().start(80);
         app.get("/", ctx -> ContentTypes.HTML.setContentType(ctx, FileAccessor.html("index.html")));
         app.get("/api/ean/{ean}", ctx -> {
             try {
-                String ean = ctx.pathParam("ean");
+                String ean = ctx.pathParam("ean").replace(" ", "");
                 DiscInformation info = DiscOgsSearch.getInstance().searchBarcode(ean);
                 if (info == null) {
                     ctx.result(new JSONObject().put("error", "No CD found").toString());
@@ -71,8 +79,8 @@ public class Main {
         app.get("/assets/*", ctx -> {
             String path = ctx.path().substring(8);
             String[] split = path.split("/");
-            System.out.println(path);
             System.out.println(ctx.path());
+            CacheControl.MAX_AGE.setCacheControl(ctx, 0);
             switch (split[0]) {
                 case "html":
                     ContentTypes.HTML.setContentType(ctx, FileAccessor.html(path.replaceFirst("html/", "")));
@@ -82,6 +90,12 @@ public class Main {
                     break;
                 case "js":
                     ContentTypes.JAVASCRIPT.setContentType(ctx, FileAccessor.js(path.replaceFirst("js/", "")));
+                    break;
+                case "images":
+                    if (split.length > 1 && split[1].equals("svg")) {
+                        ContentTypes.SVG.setContentType(ctx, FileAccessor.image(path.replaceFirst("images/", "")));
+                    }
+                    ContentTypes.PNG.setContentType(ctx, FileAccessor.image(path.replaceFirst("images/", "")));
                     break;
             }
         });

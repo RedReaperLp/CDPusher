@@ -64,7 +64,8 @@ public class FileAccessor {
             reader.close();
             return bytes;
         } catch (IOException e) {
-            new ErrorPrinter().append("Image " + string + " not found").print();
+            new ErrorPrinter().append(file.getAbsolutePath()).print();
+            new ErrorPrinter().append("Image " + runPath + "/" + string + " not found").print();
             throw new RuntimeException(e);
         }
     }
