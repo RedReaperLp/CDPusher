@@ -38,7 +38,6 @@ public class Song {
         this.discNo = tag.getFirst(FieldKey.DISC_NO);
         this.timeInSeconds = timeInSeconds;
 
-        //remove brackets from genre
         Pattern pattern = Pattern.compile("\\(.*\\)");
         Matcher matcher = pattern.matcher(genre);
         if (matcher.find()) {
