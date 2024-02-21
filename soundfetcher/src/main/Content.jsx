@@ -30,13 +30,21 @@ function Content({storage}) {
         setPopup(song);
     }
 
+    useEffect(() => {
+        document.body.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                closePopup();
+            }
+        })
+    }, []);
+
     function closePopup() {
         setPopup(false);
     }
 
     return (
         <div className={"content"}>
-            {popup && <Popup song={popup} storage={storage}/>}
+            {popup && <Popup song={popup} storage={storage} closePopup={() => closePopup()}/>}
             <a>Test EAN's - Optionally use the Searchbar above to search manually</a>
             {testEans()}
             {storage.songs.get() && storage.songs.get().map((song) => {
@@ -55,7 +63,7 @@ function Content({storage}) {
                                  alt="cover"/>
                             <a className={"song__title"}>{song.title}</a>
                         </div>
-                        <a className={"song__artist"}>{song.artist && song.artist}</a>
+                        <a className={"song__artist"}>{song.artists && song.artists[0]}</a>
                         <a className={"song__album"}>{song.album}</a>
                     </div>
                 )

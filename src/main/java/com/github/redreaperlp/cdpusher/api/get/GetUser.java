@@ -1,4 +1,4 @@
-package com.github.redreaperlp.cdpusher.api;
+package com.github.redreaperlp.cdpusher.api.get;
 
 import com.github.redreaperlp.cdpusher.user.User;
 import com.github.redreaperlp.cdpusher.user.UserManager;

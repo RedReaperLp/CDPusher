@@ -81,3 +81,20 @@
     }
   }
 }
+
+.spotify__search {
+  a {
+    text-decoration: none;
+    color: white;
+  }
+
+  input {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    margin: 10px 0;
+    padding: 10px;
+    border: none;
+    width: 80%;
+    color: white;
+  }
+}

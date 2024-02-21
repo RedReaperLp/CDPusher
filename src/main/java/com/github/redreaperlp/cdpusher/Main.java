@@ -1,6 +1,6 @@
 package com.github.redreaperlp.cdpusher;
 
-import com.github.redreaperlp.cdpusher.api.GetUser;
+import com.github.redreaperlp.cdpusher.api.get.GetUser;
 import com.github.redreaperlp.cdpusher.database.DatabaseConfiguration;
 import com.github.redreaperlp.cdpusher.http.DiscOgsSearch;
 import com.github.redreaperlp.cdpusher.user.User;

@@ -84,7 +84,12 @@ function App() {
             const object = lastJsonMessage;
             switch (object.request) {
                 case "song-repsonse":
-                    setSongs(prevState => [...prevState, object.song]);
+                    setSongs(prevState => {
+                        if (prevState.find(song => song.trackID === object.song.trackID) === undefined) {
+                            prevState.push(object.song);
+                        }
+                        return prevState;
+                    });
                     break;
                 case "song-update":
                     setSongs(prevState => {

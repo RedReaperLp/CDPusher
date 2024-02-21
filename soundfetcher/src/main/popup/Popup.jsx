@@ -1,10 +1,10 @@
 import "./Popup.scss"
 
-function Popup({song, storage}) {
+function Popup({song, storage, closePopup}) {
     const id = song.trackID;
     const index = storage.songs.get().findIndex(song => song.trackID === id);
     if (index === -1) {
-        return <div className={"popup"}>Song not found</div>
+        return <div>Song not found</div>
     }
 
     return (
@@ -17,7 +17,7 @@ function Popup({song, storage}) {
                         src={song.coverURI === null ? "/assets/images/svg/questionmark.svg" : song.coverURI}
                         alt="cover"/>
                     <a className={"song__title"}>{song.title}</a></>)}
-                {inlineItem("artist", "Artist", song.artist ? song.artist
+                {inlineItem("artist", "Artist", song.artists ? song.artists.join(", ")
                     : "Unknown")}
                 {inlineItem("album", "Album", song.album ? song.album : "Unknown")}
                 {inlineItem("track-number", "Track Nummer", ["CD-Nummer: " + song.discNo,
@@ -30,15 +30,21 @@ function Popup({song, storage}) {
                 {inlineItem("internal-cd-id", "Interne CD Nummer", song.internalDiscNo ? song.internalDiscNo : "Unknown")}
                 {(!song.spotifySearch || song.spotifyMissmatch) && <div className={"spotify__search item"}>
                     <a className={"header__title"}>Search on Spotify:</a>
-                    <input onKeyDown={(props) => {
-                        if (event.key === "Enter") {
-                            storage.webSocket.send(({
-                                request: "update",
-                                uri: props.target.value,
-                                trackID: song.trackID
-                            }))
-                        }
-                    }} type={"text"} placeholder={"Paste song URL"}></input>
+                    <div style={{display: "flex", flexDirection: "column", alignItems: "center", width: "100%"}}>
+                        <a target={"_blank"}
+                           href={("https://open.spotify.com/search/" + song.title + " - ") + (song.artists && song.artists[0])}>Click
+                            to search</a>
+                        <input onKeyDown={(props) => {
+                            if (event.key === "Enter") {
+                                storage.webSocket.send(({
+                                    request: "update",
+                                    uri: props.target.value,
+                                    trackID: song.trackID
+                                }))
+                                closePopup();
+                            }
+                        }} type={"text"} placeholder={"Paste song URL"}></input>
+                    </div>
                 </div>}
             </div>
         </div>
