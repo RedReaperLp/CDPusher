@@ -11,7 +11,9 @@ import io.javalin.websocket.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -56,6 +58,7 @@ public class User {
                 }
                 case SEARCH -> {
                     String ean = message.getString("ean").replace(" ", "");
+                    new TestPrinter().append("Searching for " + ean).print();
                     DiscInformation disc = DiscOgsSearch.getInstance().searchEan(ean);
                     disc.loadTracks(this);
                 }
@@ -79,7 +82,7 @@ public class User {
 
     public void addSong(SongData song) {
         songs.add(song);
-        ctx.send(new JSONObject().put("request", "song-repsonse").put("song", song.toJSON()).toString());
+        ctx.send(new JSONObject().put("request", "song-response").put("song", song.toJSON()).toString());
     }
 
     public JSONArray allSongsJSON() {
@@ -111,7 +114,7 @@ public class User {
             new TestPrinter().append("User " + username + " dumped").print();
             return true;
         }
-        new TestPrinter().append("Remaining time for " + username + " is " + (dumpUser.toLocalTime().getSecond() - LocalDateTime.now().toLocalTime().getSecond())).print();
+        new TestPrinter().append("Remaining time for " + username + " is " + (dumpUser.toLocalTime().toEpochSecond(LocalDate.MAX, ZoneOffset.UTC) - LocalDateTime.now().toLocalTime().toEpochSecond(LocalDate.MAX, ZoneOffset.UTC))).print();
         return false;
     }
 

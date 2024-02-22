@@ -1,69 +1,70 @@
+import {useEffect, useMemo, useRef, useState} from "react";
 import Topbar from "./topbar/Topbar.jsx";
 import Content from "./main/Content.jsx";
-import {useEffect, useState} from "react";
 import Footer from "./footer/Footer.jsx";
-import useWebSocket from "react-use-websocket";
 import {fetchSongs} from "./Fetching.jsx";
 
 function App() {
     const [songs, setSongs] = useState([]);
-    const {sendJsonMessage, lastJsonMessage, readyState} = useWebSocket('wss://redreaperlp.de/api/ws/', {
-        shouldReconnect: () => true, share: true
-    });
+    const ws = useMemo(() => new WebSocket('wss://redreaperlp.de/api/ws/'), []);
 
-    const [storage, setStorage] = useState({
+    const storageRef = useRef({
         songs: {
-            set: (value) => {
-                setSongs(value);
-            }, get: () => {
-                return songs;
-            }
-        }, webSocket: {
-            get: () => {
-                return lastJsonMessage;
-            }, send: (value) => {
-                sendJsonMessage(value);
-            }
-        }
+            setSongs: setSongs,
+            get: () => songs
+        }, webSocket: ws
     });
-
-    const createInterval = () => {
-        let intervalId;
-        const sendPing = () => {
-            sendJsonMessage({
-                request: 'ping'
-            });
-        };
-
-        intervalId = setInterval(sendPing, 1000 * 5);
-
-        const stopInterval = () => {
-            clearInterval(intervalId);
-        };
-
-        sendPing();
-        return stopInterval;
-    };
 
     useEffect(() => {
-        let stopInterval;
+        const storage = storageRef.current;
 
-        if (readyState === 1) {
-            sendJsonMessage({
+        storage.webSocket.onopen = () => {
+            storage.webSocket.send(JSON.stringify({
                 request: "login",
                 username: "RedReaperLp",
-            });
-            if (!stopInterval) {
-                stopInterval = createInterval();
-            }
-        }
-        return () => {
-            if (stopInterval) {
-                stopInterval();
+            }));
+            ping();
+        };
+
+        storage.webSocket.onmessage = (event) => {
+            const object = JSON.parse(event.data);
+            switch (object.request) {
+                case "song-response":
+                    const id = storage.songs.get().findIndex(song => song.trackID === object.song.trackID);
+                    if (id !== -1) {
+                        setSongs(prevSongs => {
+                            const updatedSongs = [...prevSongs];
+                            updatedSongs[id] = object.song;
+                            return updatedSongs;
+                        });
+                    } else {
+                        setSongs(prevSongs => [...prevSongs, object.song]);
+                    }
+                    break;
+                case "song-update":
+                    setSongs(prevSongs => {
+                        return prevSongs.map(song => {
+                            if (song.trackID === object.song.trackID) {
+                                console.log("Updated song: ", object.song);
+                                return object.song;
+                            }
+                            return song;
+                        });
+                    });
+                    break;
+                default:
+                    break;
             }
         };
-    }, [readyState]);
+    }, []);
 
+    useEffect(() => {
+        storageRef.current.songs = {
+            setSongs: setSongs,
+            get: () => songs
+        };
+        setRender(!render);
+    }, [songs]);
 
     useEffect(() => {
         fetchSongs("RedReaperLp").then(songs => {
@@ -71,58 +72,19 @@ function App() {
         });
     }, []);
 
-    useEffect(() => {
-        setStorage(prevState => ({
-            ...prevState,
-            songs: {set: (value) => setSongs(value), get: () => songs}
-        }));
-    }, [songs]);
+    function ping() {
+        setInterval(() => {
+            storageRef.current.webSocket.send(JSON.stringify({request: "ping"}));
+        }, 5000);
+    }
 
-
-    useEffect(() => {
-            if (lastJsonMessage) {
-                const object = lastJsonMessage;
-                switch (object.request) {
-                    case "song-repsonse":
-                        setSongs(prevState => {
-                            if (prevState && prevState.length > 0) {
-                                for (let i = 0; i < prevState.length; i++) {
-                                    if (prevState[i].trackID === object.song.trackID) {
-                                        prevState[i] = object.song;
-                                        return prevState;
-                                    }
-                                }
-                                prevState.push(object.song);
-                                return prevState;
-                            }
-                        });
-                        break;
-                    case
-                    "song-update"
-                    :
-                        setSongs(prevState => {
-                            const index = prevState.findIndex(song => song.trackID === object.song.trackID);
-                            if (index !== -1) {
-                                prevState[index] = object.song;
-                            }
-                            return prevState;
-                        });
-                        break;
-                    default:
-                        console.log("Unknown request", object);
-                }
-            }
-        }
-        ,
-        [lastJsonMessage]
-    )
-
+    const [render, setRender] = useState(false);
 
     return (<div className={"container"}>
-        <Topbar storage={storage}/>
-        <Content storage={storage}/>
-        <Footer storage={storage}/>
-    </div>)
+        <Topbar storage={storageRef.current}/>
+        <Content storage={storageRef.current}/>
+        <Footer storage={storageRef.current}/>
+    </div>);
 }
 
-export default App
+export default App;

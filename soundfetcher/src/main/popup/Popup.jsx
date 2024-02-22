@@ -36,11 +36,11 @@ function Popup({song, storage, closePopup}) {
                             to search</a>
                         <input onKeyDown={(props) => {
                             if (event.key === "Enter") {
-                                storage.webSocket.send(({
+                                storage.webSocket.send(JSON.stringify({
                                     request: "update",
                                     uri: props.target.value,
                                     trackID: song.trackID
-                                }))
+                                }));
                                 closePopup();
                             }
                         }} type={"text"} placeholder={"Paste song URL"}></input>

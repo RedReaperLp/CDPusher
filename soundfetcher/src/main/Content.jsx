@@ -3,15 +3,19 @@ import Popup from "./popup/Popup.jsx";
 import {useEffect, useState} from "react";
 
 function Content({storage}) {
+
+    const el = document.querySelector(".content")
+    if (el) el.lastChild.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+
     function testEans() {
         const eans = ["0 600753 962565", "4 053804 318761", "5 099920 596323", "5 099748 744425"]
         return eans.map((ean) => {
             return (
                 <div key={ean} onClick={() => {
-                    storage.webSocket.send(({
+                    storage.webSocket.send(JSON.stringify(({
                         request: "search",
                         ean: ean
-                    }))
+                    })))
                 }}>
                     <a>{ean} - - - - Click to Fetch
                         songs {ean === "5 099920 596323" && "- Click to see what happens when the CD is not documented well enough"} </a>

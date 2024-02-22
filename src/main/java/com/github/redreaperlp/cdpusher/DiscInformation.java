@@ -1,8 +1,8 @@
 package com.github.redreaperlp.cdpusher;
 
-import com.github.redreaperlp.cdpusher.database.DatabaseManager;
 import com.github.redreaperlp.cdpusher.http.DiscOgsSearch;
 import com.github.redreaperlp.cdpusher.user.User;
+import com.github.redreaperlp.cdpusher.util.logger.types.InfoPrinter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -16,7 +16,8 @@ public class DiscInformation {
     private String[] labels;
     private String resourceURL;
 
-    private long trackidCounter = DatabaseManager.getInstance().getHighestID();
+    //    private long trackidCounter = DatabaseManager.getInstance().getHighestID();
+    private long trackidCounter = 0;
 
     private final List<List<TrackInformation>> songs = new ArrayList<>();
 
@@ -33,7 +34,7 @@ public class DiscInformation {
         int failed = 0;
         JSONArray tracks = DiscOgsSearch.getInstance().searchDiscTracks(this);
         if (tracks == null) {
-            System.out.println("Failed to load tracks");
+            new InfoPrinter().append("Failed to load tracks for " + title).print();
             return;
         }
         for (int i = 0; i < tracks.length(); i++) {

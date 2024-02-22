@@ -1,10 +1,10 @@
 function LeftBAR({storage}) {
     function evalueate(props) {
         if (event.key === "Enter") {
-            storage.webSocket.send({
+            storage.webSocket.send(JSON.stringify({
                 request: "search",
                 ean: props.target.value
-            });
+            }));
         }
     }
 

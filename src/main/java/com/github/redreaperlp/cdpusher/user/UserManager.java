@@ -13,13 +13,15 @@ public class UserManager {
         Thread t = new Thread(() -> {
             while (true) {
                 try {
-                    Thread.sleep(1000 * 5);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
                 users.removeIf(User::shouldDump);
             }
         }, "User Dumper");
+        t.setDaemon(true);
+        t.start();
     }
 
     public static UserManager getInstance() {
@@ -30,7 +32,6 @@ public class UserManager {
     }
 
     public void addUser(User user) {
-        new TestPrinter().append("Adding user: " + user.getUsername()).print();
         if (users.contains(user)) {
             int index = users.indexOf(user);
             user.apply(users.get(index));
