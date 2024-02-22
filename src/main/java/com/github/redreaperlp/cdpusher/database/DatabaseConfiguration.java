@@ -1,5 +1,7 @@
 package com.github.redreaperlp.cdpusher.database;
 
+import com.github.redreaperlp.cdpusher.util.logger.types.InfoPrinter;
+import com.github.redreaperlp.cdpusher.util.logger.types.SuccessPrinter;
 import org.json.JSONObject;
 
 import javax.xml.crypto.Data;
@@ -43,7 +45,9 @@ public class DatabaseConfiguration {
     }
 
     public void initDatabase() {
+        new InfoPrinter().append("Initializing Database").print();
         this.manager = new DatabaseManager(this);
+        new SuccessPrinter().append("Database initialized").print();
     }
 
     public DatabaseManager getDBManager() {

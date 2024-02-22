@@ -80,31 +80,42 @@ function App() {
 
 
     useEffect(() => {
-        if (lastJsonMessage) {
-            const object = lastJsonMessage;
-            switch (object.request) {
-                case "song-repsonse":
-                    setSongs(prevState => {
-                        if (prevState.find(song => song.trackID === object.song.trackID) === undefined) {
-                            prevState.push(object.song);
-                        }
-                        return prevState;
-                    });
-                    break;
-                case "song-update":
-                    setSongs(prevState => {
-                        const index = prevState.findIndex(song => song.trackID === object.song.trackID);
-                        if (index !== -1) {
-                            prevState[index] = object.song;
-                        }
-                        return prevState;
-                    });
-                    break;
-                default:
-                    console.log("Unknown request", object);
+            if (lastJsonMessage) {
+                const object = lastJsonMessage;
+                switch (object.request) {
+                    case "song-repsonse":
+                        setSongs(prevState => {
+                            if (prevState && prevState.length > 0) {
+                                for (let i = 0; i < prevState.length; i++) {
+                                    if (prevState[i].trackID === object.song.trackID) {
+                                        prevState[i] = object.song;
+                                        return prevState;
+                                    }
+                                }
+                                prevState.push(object.song);
+                                return prevState;
+                            }
+                        });
+                        break;
+                    case
+                    "song-update"
+                    :
+                        setSongs(prevState => {
+                            const index = prevState.findIndex(song => song.trackID === object.song.trackID);
+                            if (index !== -1) {
+                                prevState[index] = object.song;
+                            }
+                            return prevState;
+                        });
+                        break;
+                    default:
+                        console.log("Unknown request", object);
+                }
             }
         }
-    }, [lastJsonMessage])
+        ,
+        [lastJsonMessage]
+    )
 
 
     return (<div className={"container"}>

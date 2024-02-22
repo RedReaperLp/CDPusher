@@ -6,7 +6,7 @@ function Popup({song, storage, closePopup}) {
     if (index === -1) {
         return <div>Song not found</div>
     }
-
+    console.log(song)
     return (
         <div className={"popup"}>
             <div className={"popup__content"}>
@@ -17,7 +17,7 @@ function Popup({song, storage, closePopup}) {
                         src={song.coverURI === null ? "/assets/images/svg/questionmark.svg" : song.coverURI}
                         alt="cover"/>
                     <a className={"song__title"}>{song.title}</a></>)}
-                {inlineItem("artist", "Artist", song.artists ? song.artists.join(", ")
+                {inlineItem("artist", "Artists", song.artists ? song.artists.join("\n")
                     : "Unknown")}
                 {inlineItem("album", "Album", song.album ? song.album : "Unknown")}
                 {inlineItem("track-number", "Track Nummer", ["CD-Nummer: " + song.discNo,

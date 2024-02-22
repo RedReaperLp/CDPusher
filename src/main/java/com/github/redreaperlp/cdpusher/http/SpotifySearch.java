@@ -29,8 +29,12 @@ public class SpotifySearch {
     }
 
     public JSONObject finalizeSearch(TrackInformation information) {
+        String title = information.getTitle();
+        Pattern bracketRemover = Pattern.compile("\\(.*?\\)");
+        Matcher matcher = bracketRemover.matcher(title);
+        title = matcher.replaceAll("");
         try {
-            String prepared = URLEncoder.encode((information.getTitle() + " - " + information.getArtist(0)));
+            String prepared = URLEncoder.encode((title + (information.getArtists().length > 0 ? " - " + information.getArtists()[0] : "")));
             String req = String.format(searchURL, prepared);
 
             HttpRequest request = HttpRequest.newBuilder(new URI(req)).GET().header("Authorization", "Bearer " + SpotifyAuthentication.getInstance().getBearerToken()).build();
@@ -64,11 +68,16 @@ public class SpotifySearch {
         try {
             HttpRequest request = HttpRequest.newBuilder(new URI(url)).GET().header("Authorization", "Bearer " + SpotifyAuthentication.getInstance().getBearerToken()).build();
             JSONObject response = new JSONObject(CliManager.send(request));
-            Song information = new Song(songID, response.getString("name"), response.getJSONArray("artists").getJSONObject(0).getString("name"),
+
+            String[] artists = new String[response.getJSONArray("artists").length()];
+            for (int i = 0; i < response.getJSONArray("artists").length(); i++) {
+                artists[i] = response.getJSONArray("artists").getJSONObject(i).getString("name");
+            }
+
+            return new Song(songID, response.getString("name"), artists,
                     response.getJSONObject("album").getString("name"), 0, 0, response.getLong("duration_ms") / 1000,
                     Integer.parseInt(response.getJSONObject("album").getString("release_date").split("-")[0]), 0,
                     response.getJSONObject("album").getJSONArray("images").getJSONObject(0).getString("url"));
-            return information;
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {

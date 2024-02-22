@@ -1,6 +1,6 @@
 import "./Content.scss";
 import Popup from "./popup/Popup.jsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 function Content({storage}) {
     function testEans() {
@@ -63,7 +63,7 @@ function Content({storage}) {
                                  alt="cover"/>
                             <a className={"song__title"}>{song.title}</a>
                         </div>
-                        <a className={"song__artist"}>{song.artists && song.artists[0]}</a>
+                        <a className={"song__artist"}>{song.artists && song.artists.join("\n")}</a>
                         <a className={"song__album"}>{song.album}</a>
                     </div>
                 )

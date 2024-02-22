@@ -42,7 +42,7 @@ public class Main {
 
     public void init() {
         Loggers.load();
-        new DatabaseConfiguration("45.81.234.99", "root", "CD-PUSHER", "cd_pusher").initDatabase();
+        new DatabaseConfiguration("localhost", "cdpusher", "CDPUSHER", "CDPusher").initDatabase();
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {

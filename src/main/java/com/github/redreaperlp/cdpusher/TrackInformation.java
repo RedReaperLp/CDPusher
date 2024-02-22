@@ -153,7 +153,7 @@ public class TrackInformation implements SongData {
             this.albumReleaseDate = albumReleaseDate;
             return new Song(this.songID,
                     this.title,
-                    this.artists[0],
+                    this.artists,
                     this.album,
                     this.trackNo,
                     this.discNo,
@@ -197,7 +197,7 @@ public class TrackInformation implements SongData {
         JSONObject object = new JSONObject();
 
         object.put(DataKeys.SongData.TITLE.getKey(), title == null ? JSONObject.NULL : title);
-        object.put(DataKeys.SongData.ARTIST.getKey(), artists == null ? JSONObject.NULL : artists);
+        object.put(DataKeys.SongData.ARTISTS.getKey(), artists == null ? JSONObject.NULL : artists);
         object.put(DataKeys.SongData.DURATION.getKey(), duration);
         object.put(DataKeys.SongData.COVER_URI.getKey(), cover == null ? JSONObject.NULL : cover);
         object.put(DataKeys.SongData.ALBUM.name(), album);
@@ -226,6 +226,10 @@ public class TrackInformation implements SongData {
                 ", album='" + album + '\'' +
                 ", albumReleaseDate='" + albumReleaseDate + '\'' +
                 "}";
+    }
+
+    public String[] getArtists() {
+        return artists;
     }
 
     public static class MissmatchData implements SongData {
@@ -330,7 +334,7 @@ public class TrackInformation implements SongData {
             JSONObject object = new JSONObject();
 
             object.put(DataKeys.SongData.TITLE.getKey(), title);
-            object.put(DataKeys.SongData.ARTIST.getKey(), artists);
+            object.put(DataKeys.SongData.ARTISTS.getKey(), artists);
             object.put(DataKeys.SongData.DURATION.getKey(), duration);
             object.put(DataKeys.SongData.COVER_URI.getKey(), imageURL);
             object.put(DataKeys.SongData.ALBUM.name(), album);

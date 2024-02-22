@@ -13,7 +13,7 @@ import java.sql.SQLException;
 public class Song implements SongData {
     private final long songID;
     private String title;
-    private String artist;
+    private String[] artists;
     private String album;
     private int trackNo;
     private int year;
@@ -22,7 +22,7 @@ public class Song implements SongData {
     private long internalDiscNo;
     private String imageURI;
 
-    public Song(long songID, String title, String artist, String album, int trackNo, int discNo, long duration, int year, long internalDiscNo, String imageURI) {
+    public Song(long songID, String title, String[] artists, String album, int trackNo, int discNo, long duration, int year, long internalDiscNo, String imageURI) {
         this.internalDiscNo = internalDiscNo;
         this.timeInSeconds = duration;
         this.imageURI = imageURI;
@@ -30,7 +30,7 @@ public class Song implements SongData {
         this.songID = songID;
         this.discNo = discNo;
         this.album = album;
-        this.artist = artist;
+        this.artists = artists;
         this.year = year;
         this.title = title;
     }
@@ -39,7 +39,7 @@ public class Song implements SongData {
     public String toString() {
         return "Song{" +
                 "title='" + title + '\'' +
-                ", artist='" + artist + '\'' +
+                ", artist='" + artists + '\'' +
                 ", album='" + album + '\'' +
                 ", track=" + trackNo +
                 ", year=" + year +
@@ -51,7 +51,7 @@ public class Song implements SongData {
 
     public void pushToDB(int discNo, int totalDiscs, Connection connection) {
         if (existsInDB(connection)) {
-            int dialogResult = JOptionPane.showConfirmDialog(null, "Song already exists in database: " + title + " - " + artist + " - " + year + "\nDo you want to update it?", "Song already exists", JOptionPane.YES_NO_OPTION);
+            int dialogResult = JOptionPane.showConfirmDialog(null, "Song already exists in database: " + title + " - " + artists + " - " + year + "\nDo you want to update it?", "Song already exists", JOptionPane.YES_NO_OPTION);
             if (dialogResult == JOptionPane.YES_OPTION) {
                 updateDB(connection);
             }
@@ -62,7 +62,7 @@ public class Song implements SongData {
 
     private void updateDB(Connection connection) {
         try {
-            String updateQuery = "UPDATE cd_pusher.music SET title = ?, artist = ?, album = ?, track = ?,discNo=?, year = ?, duration = ?, image = ?, internalDiscNo = ? WHERE id = ?";
+            String updateQuery = "UPDATE CDPusher.music SET title = ?, artist = ?, album = ?, track = ?,discNo=?, year = ?, duration = ?, image = ?, internalDiscNo = ? WHERE id = ?";
             try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
                 setParameters(stmt);
                 stmt.execute();
@@ -74,7 +74,7 @@ public class Song implements SongData {
 
     private void insertIntoDB(Connection connection) {
         try {
-            try (PreparedStatement stmt = connection.prepareStatement("INSERT INTO cd_pusher.music (track, artist, album, track, discNo, year, duration, image, internalDiscNo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+            try (PreparedStatement stmt = connection.prepareStatement("INSERT INTO CDPusher.music (track, artist, album, track, discNo, year, duration, image, internalDiscNo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
                 setParameters(stmt);
                 stmt.execute();
             }
@@ -85,7 +85,7 @@ public class Song implements SongData {
 
     private void setParameters(PreparedStatement stmt) throws SQLException {
         stmt.setString(1, title);
-        stmt.setString(2, artist);
+        stmt.setString(2, JSONObject.valueToString(artists));
         stmt.setString(3, album);
         stmt.setInt(4, trackNo);
         stmt.setInt(5, discNo);
@@ -98,9 +98,9 @@ public class Song implements SongData {
 
     public boolean existsInDB(Connection connection) {
         try {
-            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM cd_pusher.music WHERE title = ? AND artist = ? AND year = ?");
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM CDPusher.music WHERE title = ? AND artist = ? AND year = ?");
             stmt.setString(1, title);
-            stmt.setString(2, artist);
+            stmt.setString(2, JSONObject.valueToString(artists));
             stmt.setInt(3, year);
             stmt.execute();
             ResultSet resultSet = stmt.getResultSet();
@@ -131,7 +131,7 @@ public class Song implements SongData {
     public JSONObject toJSON() {
         return new JSONObject()
                 .put(DataKeys.SongData.TITLE.getKey(), title)
-                .put(DataKeys.SongData.ARTIST.getKey(), artist)
+                .put(DataKeys.SongData.ARTISTS.getKey(), artists)
                 .put(DataKeys.SongData.ALBUM.getKey(), album)
                 .put(DataKeys.SongData.TRACK_NO.getKey(), trackNo)
                 .put(DataKeys.SongData.YEAR.getKey(), year)

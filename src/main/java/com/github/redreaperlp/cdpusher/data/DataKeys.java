@@ -3,7 +3,7 @@ package com.github.redreaperlp.cdpusher.data;
 public class DataKeys {
     public static enum SongData {
         TITLE("title"),
-        ARTIST("artist"),
+        ARTISTS("artists"),
         ALBUM("album"),
         TRACK_NO("trackNo"),
         DISC_NO("discNo"),
