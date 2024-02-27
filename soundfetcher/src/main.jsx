@@ -1,10 +1,10 @@
-import React from 'react'
+import React, {Profiler} from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-    <React.Profiler>
-            <App/>
-    </React.Profiler>,
+    <Profiler>
+        <App/>
+    </Profiler>,
 )

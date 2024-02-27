@@ -5,7 +5,12 @@ import {useEffect, useState} from "react";
 function Content({storage}) {
 
     const el = document.querySelector(".content")
-    if (el) el.lastChild.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+
+    if (el && el.childElementCount % 5 === 0) el.lastChild.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+        inline: "nearest"
+    });
 
     function testEans() {
         const eans = ["0 600753 962565", "4 053804 318761", "5 099920 596323", "5 099748 744425"]
@@ -51,7 +56,7 @@ function Content({storage}) {
             {popup && <Popup song={popup} storage={storage} closePopup={() => closePopup()}/>}
             <a>Test EAN's - Optionally use the Searchbar above to search manually</a>
             {testEans()}
-            {storage.songs.get() && storage.songs.get().map((song) => {
+            {storage.songs.songs && storage.songs.songs.map((song) => {
                 let className = "song";
                 if (song.spotifyMissmatch || !song.spotifySearch) {
                     className += " song__missmatch";

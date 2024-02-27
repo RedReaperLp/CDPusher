@@ -8,7 +8,8 @@ function Footer({storage}) {
                     request: "clear-songs"
                 }));
                 storage.songs.setSongs([]);
-            }}>Clear Songs</button>
+            }}>Clear Songs
+            </button>
         </div>
     );
 }

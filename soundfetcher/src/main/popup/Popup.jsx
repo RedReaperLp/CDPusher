@@ -2,7 +2,7 @@ import "./Popup.scss"
 
 function Popup({song, storage, closePopup}) {
     const id = song.trackID;
-    const index = storage.songs.get().findIndex(song => song.trackID === id);
+    const index = storage.songs.songs.findIndex(song => song.trackID === id);
     if (index === -1) {
         return <div>Song not found</div>
     }

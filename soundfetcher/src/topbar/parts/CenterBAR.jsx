@@ -1,4 +1,3 @@
-
 export default function CenterBAR() {
     return (
         <div className="center-bar">

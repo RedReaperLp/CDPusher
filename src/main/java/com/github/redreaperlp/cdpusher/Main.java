@@ -75,7 +75,7 @@ public class Main {
             String path = ctx.path().substring(8);
             String[] split = path.split("/");
             System.out.println(ctx.path());
-            CacheControl.MAX_AGE.setCacheControl(ctx, 0);
+            CacheControl.NO_CACHE.setCacheControl(ctx);
             switch (split[0]) {
                 case "html":
                     ContentTypes.HTML.setContentType(ctx, FileAccessor.html(path.replaceFirst("html/", "")));

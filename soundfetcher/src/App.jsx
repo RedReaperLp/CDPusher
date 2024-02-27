@@ -11,9 +11,10 @@ function App() {
     const storageRef = useRef({
         songs: {
             setSongs: setSongs,
-            get: () => songs
+            songs: songs,
         }, webSocket: ws
     });
+
 
     useEffect(() => {
         const storage = storageRef.current;
@@ -28,21 +29,23 @@ function App() {
 
         storage.webSocket.onmessage = (event) => {
             const object = JSON.parse(event.data);
+            const curSongs = storageRef.current.songs;
+            console.log(storageRef.current.songs.songs);
             switch (object.request) {
                 case "song-response":
-                    const id = storage.songs.get().findIndex(song => song.trackID === object.song.trackID);
+                    const id = curSongs.songs.findIndex(song => song.trackID === object.song.trackID);
                     if (id !== -1) {
-                        setSongs(prevSongs => {
+                        curSongs.setSongs(prevSongs => {
                             const updatedSongs = [...prevSongs];
                             updatedSongs[id] = object.song;
                             return updatedSongs;
                         });
                     } else {
-                        setSongs(prevSongs => [...prevSongs, object.song]);
+                        curSongs.setSongs(prevSongs => [...prevSongs, object.song]);
                     }
                     break;
                 case "song-update":
-                    setSongs(prevSongs => {
+                    curSongs.setSongs(prevSongs => {
                         return prevSongs.map(song => {
                             if (song.trackID === object.song.trackID) {
                                 console.log("Updated song: ", object.song);
@@ -61,7 +64,7 @@ function App() {
     useEffect(() => {
         storageRef.current.songs = {
             setSongs: setSongs,
-            get: () => songs
+            songs: songs,
         };
         setRender(!render);
     }, [songs]);
