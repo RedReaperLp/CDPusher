@@ -62,10 +62,12 @@ function App() {
     }, []);
 
     useEffect(() => {
-        storageRef.current.songs = {
-            setSongs: setSongs,
-            songs: songs,
-        };
+        storageRef.current = {
+            songs: {
+                setSongs: setSongs,
+                songs: songs,
+            }, webSocket: storageRef.current.webSocket
+        }
         setRender(!render);
     }, [songs]);
 

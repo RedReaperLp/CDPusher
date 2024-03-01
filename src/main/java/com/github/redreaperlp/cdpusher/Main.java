@@ -34,12 +34,6 @@ public class Main {
         instance.init();
     }
 
-    List<List<String>> data = new ArrayList<>();
-
-    JProgressBar progressBar = new JProgressBar();
-    JTable table = new JTable();
-    JPanel panel = new JPanel();
-
     public void init() {
         Loggers.load();
         new DatabaseConfiguration("localhost", "cdpusher", "CDPUSHER", "CDPusher").initDatabase();

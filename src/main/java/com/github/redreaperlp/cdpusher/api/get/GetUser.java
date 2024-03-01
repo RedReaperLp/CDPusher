@@ -2,6 +2,7 @@ package com.github.redreaperlp.cdpusher.api.get;
 
 import com.github.redreaperlp.cdpusher.user.User;
 import com.github.redreaperlp.cdpusher.user.UserManager;
+import com.github.redreaperlp.cdpusher.util.enums.responses.CacheControl;
 import com.github.redreaperlp.cdpusher.util.enums.responses.ContentTypes;
 import com.github.redreaperlp.cdpusher.util.logger.types.TestPrinter;
 import io.javalin.Javalin;
@@ -20,6 +21,7 @@ public class GetUser {
                 ctx.status(410);
                 return;
             }
+            CacheControl.NO_CACHE.setCacheControl(ctx);
             ContentTypes.JSON.setContentType(ctx, user.allSongsJSON().toString());
         });
     }
