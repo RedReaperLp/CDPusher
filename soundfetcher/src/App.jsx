@@ -7,12 +7,11 @@ import {fetchSongs} from "./Fetching.jsx";
 function App() {
     const [songs, setSongs] = useState([]);
     const ws = useMemo(() => new WebSocket('wss://redreaperlp.de/api/ws/'), []);
-
+    const username = "RerLp";
     const storageRef = useRef({
-        songs: {
-            setSongs: setSongs,
-            songs: songs,
-        }, webSocket: ws
+        songs: songs,
+        setSongs: setSongs,
+        webSocket: ws
     });
 
 
@@ -22,7 +21,7 @@ function App() {
         storage.webSocket.onopen = () => {
             storage.webSocket.send(JSON.stringify({
                 request: "login",
-                username: "RedReaperLp",
+                username: username
             }));
             ping();
         };
@@ -30,22 +29,28 @@ function App() {
         storage.webSocket.onmessage = (event) => {
             const object = JSON.parse(event.data);
             const curSongs = storageRef.current.songs;
-            console.log(storageRef.current.songs.songs);
             switch (object.request) {
                 case "song-response":
-                    const id = curSongs.songs.findIndex(song => song.trackID === object.song.trackID);
+                    const id = curSongs.findIndex(song => song.trackID === object.song.trackID);
                     if (id !== -1) {
-                        curSongs.setSongs(prevSongs => {
+                        storageRef.current.setSongs(prevSongs => {
                             const updatedSongs = [...prevSongs];
                             updatedSongs[id] = object.song;
                             return updatedSongs;
                         });
                     } else {
-                        curSongs.setSongs(prevSongs => [...prevSongs, object.song]);
+                        storageRef.current.setSongs(prevSongs => [...prevSongs, object.song]);
                     }
+                    const el = document.querySelector(".content");
+
+                    if (el && el.childElementCount % 5 === 0) el.lastChild.scrollIntoView({
+                        behavior: "smooth",
+                        block: "end",
+                        inline: "nearest"
+                    });
                     break;
                 case "song-update":
-                    curSongs.setSongs(prevSongs => {
+                    storageRef.current.setSongs(prevSongs => {
                         return prevSongs.map(song => {
                             if (song.trackID === object.song.trackID) {
                                 console.log("Updated song: ", object.song);
@@ -63,16 +68,15 @@ function App() {
 
     useEffect(() => {
         storageRef.current = {
-            songs: {
-                setSongs: setSongs,
-                songs: songs,
-            }, webSocket: storageRef.current.webSocket
+            setSongs: setSongs,
+            songs: songs,
+            webSocket: storageRef.current.webSocket
         }
         setRender(!render);
     }, [songs]);
 
     useEffect(() => {
-        fetchSongs("RedReaperLp").then(songs => {
+        fetchSongs(username).then(songs => {
             setSongs(songs);
         });
     }, []);

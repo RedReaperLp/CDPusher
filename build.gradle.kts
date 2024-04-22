@@ -22,7 +22,6 @@ dependencies {
     implementation("org.slf4j", "slf4j-simple", "1.7.30")
     implementation("org.slf4j", "slf4j-api", "1.7.30")
     implementation("ch.qos.logback", "logback-classic", "1.4.11")
-    implementation("org:jaudiotagger:2.0.3")
 }
 
 tasks.withType<ShadowJar> {

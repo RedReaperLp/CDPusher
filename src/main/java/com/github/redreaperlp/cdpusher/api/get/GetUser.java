@@ -6,6 +6,7 @@ import com.github.redreaperlp.cdpusher.util.enums.responses.CacheControl;
 import com.github.redreaperlp.cdpusher.util.enums.responses.ContentTypes;
 import com.github.redreaperlp.cdpusher.util.logger.types.TestPrinter;
 import io.javalin.Javalin;
+import org.json.JSONArray;
 
 public class GetUser {
     public GetUser(Javalin app) {
@@ -18,7 +19,7 @@ public class GetUser {
             User user = UserManager.getInstance().getUser(username);
             if (user == null) {
                 new TestPrinter().append("User not found").print();
-                ctx.status(410);
+                ctx.result(new JSONArray().toString());
                 return;
             }
             CacheControl.NO_CACHE.setCacheControl(ctx);

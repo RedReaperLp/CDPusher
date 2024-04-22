@@ -7629,7 +7629,7 @@ function Topbar(storage) {
 }
 function Popup({ song, storage, closePopup }) {
   const id2 = song.trackID;
-  const index = storage.songs.songs.findIndex((song2) => song2.trackID === id2);
+  const index = storage.songs.findIndex((song2) => song2.trackID === id2);
   if (index === -1) {
     return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: "Song not found" });
   }
@@ -7761,7 +7761,7 @@ function Content({ storage }) {
     popup && /* @__PURE__ */ jsxRuntimeExports.jsx(Popup, { song: popup, storage, closePopup: () => closePopup() }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("a", { children: "Test EAN's - Optionally use the Searchbar above to search manually" }),
     testEans(),
-    storage.songs.songs && storage.songs.songs.map((song) => {
+    storage.songs && storage.songs.map((song) => {
       let className = "song";
       if (song.spotifyMissmatch || !song.spotifySearch) {
         className += " song__missmatch";
@@ -7832,7 +7832,7 @@ function App() {
       const object = JSON.parse(event2.data);
       switch (object.request) {
         case "song-response":
-          const id2 = storage.songs.songs.findIndex((song) => song.trackID === object.song.trackID);
+          const id2 = storage.songs.findIndex((song) => song.trackID === object.song.trackID);
           if (id2 !== -1) {
             setSongs((prevSongs) => {
               const updatedSongs = [...prevSongs];

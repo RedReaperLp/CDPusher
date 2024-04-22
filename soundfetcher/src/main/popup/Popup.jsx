@@ -2,11 +2,11 @@ import "./Popup.scss"
 
 function Popup({song, storage, closePopup}) {
     const id = song.trackID;
-    const index = storage.songs.songs.findIndex(song => song.trackID === id);
+    const index = storage.songs.findIndex(song => song.trackID === id);
     if (index === -1) {
         return <div>Song not found</div>
     }
-    console.log(song)
+    console.log(storage.songs[index])
     return (
         <div className={"popup"}>
             <div className={"popup__content"}>
@@ -26,7 +26,7 @@ function Popup({song, storage, closePopup}) {
                     Math.floor(song.duration / 60), ":", String.prototype.padStart.call(song.duration % 60, 2, "0"), " Minuten"])}
                 {inlineItem("release-date", "Erscheinungsdatum", song.year ? song.year : "Unknown")}
                 {inlineItem("spotify", "Spotify", ["Searched on Spotify: " + (song.spotifySearch ? "Yes" : "No"),
-                    <br key={song.title + song.track + "" + song.track}></br>, "Missmatch: " + (song.spotifySearchMissMatch ? "Yes" : "No")])}
+                    <br key={song.title + song.track + "" + song.track}></br>, "Missmatch: " + (song.spotifyMissmatch ? "Yes" : "No")])}
                 {inlineItem("internal-cd-id", "Interne CD Nummer", song.internalDiscNo ? song.internalDiscNo : "Unknown")}
                 {(!song.spotifySearch || song.spotifyMissmatch) && <div className={"spotify__search item"}>
                     <a className={"header__title"}>Search on Spotify:</a>
