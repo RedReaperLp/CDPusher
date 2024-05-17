@@ -1,5 +1,5 @@
 import "./Content.scss";
-import Popup from "./popup/Popup.jsx";
+import {Popup} from "./popup/Popup.jsx";
 import {useEffect, useState} from "react";
 
 function Content({storage}) {

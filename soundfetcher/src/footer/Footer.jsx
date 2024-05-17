@@ -7,7 +7,8 @@ function Footer({storage}) {
                 storage.webSocket.send(JSON.stringify({
                     request: "clear-songs"
                 }));
-                storage.songs.setSongs([]);
+                console.log(storage)
+                storage.setSongs([]);
             }}>Clear Songs
             </button>
         </div>

@@ -1,6 +1,6 @@
-echo CDing to /root/CDPusher
+echo CDing to /root/Reaper/projects/CDPusher
 echo
-cd /root/CDPusher
+cd /root/Reaper/projects/CDPusher
 cd soundfetcher
 echo "Building project with Vite in soundfetcher folder..."
 npx vite build

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Popup</title>
+</head>
+<body>
+<div class="popup">
+    <div class="popup_content">
+        <div class="cover">
+            <img height="180px" src="" width="180px">
+        </div>
+        <div class="content">
+            <div class="upper">
+                <div class="main__info">
+                    <div class="title__album">
+                        <h1 class="song__title">Titel</h1>
+                        <p>Album</p>
+                    </div>
+                    <p class="song_name">Year - Text</p>
+                </div>
+                <div>
+                    TEST
+                </div>
+            </div>
+            <hr style="width: 100%">
+            <div>
+                <p class="duration">1:00 Minutes/Seconds</p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<style>
+    .popup {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: fixed;
+        top: calc(50% - 100px);
+        left: calc(50% - 300px);
+        width: 600px;
+        height: 200px;
+        background: red;
+        overflow: hidden; /* Hinzugefügt, um den Inhalt zu begrenzen */
+    }
+
+    .popup_content {
+        display: flex;
+        padding: 10px;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box; /* Hinzugefügt, um Padding in die Berechnung einzubeziehen */
+    }
+
+    .content {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        width: 65%;
+        height: 100%;
+    }
+
+    .cover {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 180px;
+        height: 180px;
+        margin-right: 1em;
+    }
+
+    .song__title, .title__album p {
+        margin: 0;
+    }
+
+    .song_name {
+        margin-top: 0;
+    }
+
+    .song__title {
+        margin-right: 1em;
+    }
+
+    .title__album {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+
+    .main__info {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        width: 50%;
+    }
+
+    .upper {
+        display: flex;
+        width: 100%;
+    }
+</style>
+</html>

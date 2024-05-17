@@ -1,5 +1,4 @@
 import Swal from "sweetalert2";
-import "./Popup.scss";
 
 export function Popup({song, storage, closePopup}) {
     const id = song.trackID;
@@ -25,14 +24,17 @@ export function Popup({song, storage, closePopup}) {
 
         Swal.fire({
             title: "Enter Spotify URL",
-            input: "url",
-
-            attributes: {
-                placeholder: "Enter Spotify URL",
-                type: "url",
+            content: {
+                element: "input",
+                attributes: {
+                    placeholder: "Enter Spotify URL",
+                    type: "url",
+                },
             },
-            showCancelButton: true,
-            confirmButtonText: "Submit"
+            buttons: {
+                cancel: "Cancel",
+                confirm: "Submit",
+            },
         }).then((value) => {
             if (value === null) {
                 return;
@@ -40,7 +42,7 @@ export function Popup({song, storage, closePopup}) {
             storage.webSocket.send(
                 JSON.stringify({
                     request: "update",
-                    uri: value.value,
+                    uri: value,
                     trackID: song.trackID,
                 })
             );
@@ -49,65 +51,56 @@ export function Popup({song, storage, closePopup}) {
         });
     }
 
-    function resolveButton() {
-        if (song.spotifySearch && !song.spotifyMissmatch) {
-            return <button className="popup__button" onClick={() => closePopup()}>Close</button>;
-        } else {
-            return <button className="popup__button" onClick={() => fireSwal()}>Search in Spotify</button>
-        }
-    }
-
     return (
-        <div className="popup__container">
-            <div className="popup__content">
-                <div className="popup__cover">
+        <div className="popup">
+            <div className="popup_content">
+                <div className="cover">
                     <img height="180px" src={song.coverURI === null
                         ? "/assets/images/svg/questionmark.svg"
                         : song.coverURI} width="180px" alt={"Song Cover"}/>
                 </div>
-                <div className="popup__info">
-                    <div className="popup__separator">
-                        <div className="popup__row">
-                            <div className="popup__upper">
-                                <h1 className="popup__title overflow">{song.title}</h1>
-                                <p className={"overflow"}><b>Album:</b> {song.album ? song.album : "Unbekannt"}
-                                </p>
+                <div className="content">
+                    <div className="content_seperator">
+                        <div className="row_div">
+                            <div className="upper_div">
+                                <h1 className="song__title">{song.title}</h1>
+                                <p>Album: {song.album ? song.album : "Unbekannt"}</p>
                             </div>
-                            <div className="popup__lower">
+                            <div className="lower_div">
                                 <p className="release_year">{song.year ? song.year : "Unbekannt"}</p>
                             </div>
                         </div>
-                        <div className="popup__row">
-                            <div className="popup__upper">
-                                <div className="popup__space-around">
+                        <div className="row_div">
+                            <div className="upper_div">
+                                <div className="space_around">
                                     <p>CD: {song.discNo}</p>
                                     <p>Track: {song.trackNo}</p>
                                 </div>
                             </div>
-                            <div className="popup__lower">
+                            <div className="lower_div">
                                 <p>Interne CD Nummer: {song.internalDiscNo ? song.internalDiscNo : "Unbekannt"}</p>
                             </div>
                         </div>
                     </div>
-                    <hr style={{width: "100%"}}/>
-                    <div className="popup__separator popup__half-height">
-                        <div className="popup__row">
-                            <div className="popup__upper">
+                    <hr style="width: 100%"/>
+                    <div className="content_seperator half_h">
+                        <div className="row_div">
+                            <div className="upper_div">
                                 <p className="duration">{Math.floor(song.duration / 60) +
                                     ":" + String.prototype.padStart.call(song.duration % 60, 2, "0") +
                                     " Minuten"}</p>
                             </div>
                         </div>
-                        <div className="popup__row">
-                            <div className="popup__lower">
+                        <div className="row_div">
+                            <div className="lower_div">
                                 <p className="composer">Spotify State</p>
-                                <div className="popup__indicator"
+                                <div className="indicator"
                                      style={{background: resolveColor(song.spotifySearch, song.spotifyMissmatch)}}></div>
                             </div>
                         </div>
                     </div>
-                    <div className="popup__separator popup__button_div popup__half-height popup__full-width popup__center">
-                        {resolveButton()}
+                    <div className="content_seperator half_h full_w center">
+                        <button onClick={() => fireSwal()}>Enter URL</button>
                     </div>
                 </div>
             </div>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Popup</title>
+</head>
+<body>
+<div class="popup">
+    <div class="popup_content">
+        <div class="cover">
+            <img height="180px" src="" width="180px">
+        </div>
+        <div class="content">
+            <div class="content_seperator">
+                <div class="row_div">
+                    <div class="upper_div">
+                        <h1 class="song__title">Title</h1>
+                        <p>Album</p>
+                    </div>
+                    <div class="lower_div">
+                        <p class="release_year">Year</p>
+                    </div>
+                </div>
+                <div class="row_div">
+                    <div class="upper_div">
+                        <div class="space_around">
+                            <p>CD: {cd id}</p>
+                            <p>Track: {track id}</p>
+                        </div>
+                    </div>
+                    <div class="lower_div">
+                        <p>Nummer: {interne nummer}</p>
+                    </div>
+                </div>
+            </div>
+            <hr style="width: 100%">
+            <div class="content_seperator half_h">
+                <div class="row_div">
+                    <div class="upper_div">
+                        <p class="duration">1:00 Minutes/Seconds</p>
+                    </div>
+                </div>
+                <div class="row_div">
+                    <div class="lower_div">
+                        <p class="composer">Spotify State</p>
+                        <div class="indicator"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="content_seperator half_h full_w center">
+                    <button>Enter URL</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<style>
+    .popup {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: fixed;
+        width: 800px;
+        height: 200px;
+        background: red;
+        overflow: hidden;
+        border-radius: 10px;
+    }
+
+    .popup_content {
+        display: flex;
+        padding: 10px;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+    }
+
+    .content {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        width: 100%;
+        height: 100%;
+    }
+
+    .cover {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 180px;
+        height: 180px;
+        margin-right: 1em;
+    }
+
+    .song__title, .upper_div p {
+        margin: 0;
+    }
+
+    .song__title {
+        margin-right: 1em;
+    }
+
+    .upper_div {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+        height: 50%;
+    }
+
+    .lower_div {
+        display: flex;
+        align-items: center;
+        height: 50%;
+    }
+
+    .row_div {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        width: 50%;
+        height: 100%;
+        margin-right: 1em;
+    }
+
+    .content_seperator {
+        display: flex;
+        width: 100%;
+        /*height: 100%;*/
+    }
+
+    .half_h {
+        height: 50%;
+    }
+
+    .full_w {
+        width: 100%;
+    }
+
+    .center {
+        justify-content: center;
+    }
+
+    .space_around p {
+        margin-right: 2em;
+    }
+
+    button {
+        width: 50%;
+        height: 100%;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+    }
+
+    .indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: green;
+        margin-left: 1em;
+    }
+</style>
+</html>

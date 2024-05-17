@@ -35,7 +35,7 @@ public class Main {
 
     public void init() {
         Loggers.load();
-        new DatabaseConfiguration("45.81.235.52", "cdpusher", "CDPUSHER", "CDPusher").initDatabase();
+        new DatabaseConfiguration("45.81.235.52", "cdpusher", "CDPUSHER", "cdpusher").initDatabase();
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
