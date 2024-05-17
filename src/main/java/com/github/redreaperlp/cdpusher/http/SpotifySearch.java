@@ -41,11 +41,7 @@ public class SpotifySearch {
             JSONObject response = new JSONObject(CliManager.send(request)).getJSONObject("tracks");
             JSONObject track = response.getJSONArray("items").getJSONObject(0);
             return response;
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
+        } catch (URISyntaxException | IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
@@ -78,11 +74,7 @@ public class SpotifySearch {
                     response.getJSONObject("album").getString("name"), 0, 0, response.getLong("duration_ms") / 1000,
                     Integer.parseInt(response.getJSONObject("album").getString("release_date").split("-")[0]), 0,
                     response.getJSONObject("album").getJSONArray("images").getJSONObject(0).getString("url"));
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
+        } catch (URISyntaxException | IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }

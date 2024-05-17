@@ -6,7 +6,7 @@ export function Popup({song, storage, closePopup}) {
     const index = storage.songs.findIndex((song) => song.trackID === id);
 
     if (index === -1) {
-        return <div>Song not found</div>;
+        return (<></>);
     }
     console.log(storage.songs[index]);
 

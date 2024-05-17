@@ -3,7 +3,8 @@ package com.github.redreaperlp.cdpusher;
 import com.github.redreaperlp.cdpusher.api.get.GetUser;
 import com.github.redreaperlp.cdpusher.database.DatabaseConfiguration;
 import com.github.redreaperlp.cdpusher.http.DiscOgsSearch;
-import com.github.redreaperlp.cdpusher.user.User;
+import com.github.redreaperlp.cdpusher.user.SocketManager;
+import com.github.redreaperlp.cdpusher.user.WebsocketSession;
 import com.github.redreaperlp.cdpusher.util.FileAccessor;
 import com.github.redreaperlp.cdpusher.util.enums.responses.CacheControl;
 import com.github.redreaperlp.cdpusher.util.enums.responses.ContentTypes;
@@ -48,7 +49,21 @@ public class Main {
         }).start(80);
         new GetUser(app);
         app.get("/", ctx -> ContentTypes.HTML.setContentType(ctx, FileAccessor.html("index.html")));
-        app.ws("/api/ws", new User().getHandler());
+        app.ws("/api/ws", ws -> {
+            ws.onConnect(ctx -> {
+                SocketManager.getInstance().addSession(new WebsocketSession(ctx));
+            });
+
+            ws.onMessage(ctx -> {
+                SocketManager.getInstance().getSession(ctx).ifPresent(session -> {
+                    session.onMessage(ctx);
+                });
+            });
+
+            ws.onClose(ctx -> {
+                SocketManager.getInstance().removeSession(new WebsocketSession(ctx));
+            });
+        });
 
         app.get("/api/ean/{ean}", ctx -> {
             try {
