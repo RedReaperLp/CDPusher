@@ -232,6 +232,15 @@ public class TrackInformation implements SongData {
         return artists;
     }
 
+    public Song toSong() {
+        int year = 0;
+        if (albumReleaseDate != null) {
+            year = Integer.parseInt(albumReleaseDate.split("-")[0]);
+        }
+
+        return new Song(songID, title, artists, album, trackNo, discNo, duration, year, internalCDNumeration, cover);
+    }
+
     public static class MissmatchData implements SongData {
         private long songID;
         private String title;

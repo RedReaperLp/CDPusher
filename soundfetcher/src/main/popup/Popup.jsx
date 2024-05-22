@@ -1,6 +1,16 @@
 import Swal from "sweetalert2";
 import "./Popup.scss";
 
+function useDiscOGs(song, storage, closePopup) {
+    console.log(storage);
+    storage.webSocket.send(JSON.stringify({
+        request: "use-discogs",
+        discNo: song.discNo,
+        trackNo: song.trackNo,
+    }))
+    closePopup();
+}
+
 export function Popup({song, storage, closePopup}) {
     const id = song.trackID;
     const index = storage.songs.findIndex((song) => song.trackID === id);
@@ -53,7 +63,10 @@ export function Popup({song, storage, closePopup}) {
         if (song.spotifySearch && !song.spotifyMissmatch) {
             return <button className="popup__button" onClick={() => closePopup()}>Close</button>;
         } else {
-            return <button className="popup__button" onClick={() => fireSwal()}>Search in Spotify</button>
+            return <>
+                <button className="popup__button" onClick={() => fireSwal()}>Search in Spotify</button>
+                <button className="popup__button" onClick={() => useDiscOGs(song, storage, closePopup)}>Use DiscOGs</button>
+            </>
         }
     }
 

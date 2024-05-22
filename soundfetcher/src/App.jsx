@@ -3,6 +3,7 @@ import Topbar from "./topbar/Topbar.jsx";
 import Content from "./main/Content.jsx";
 import Footer from "./footer/Footer.jsx";
 import {fetchSongs} from "./Fetching.jsx";
+import Swal from "sweetalert2";
 
 function App() {
     const [songs, setSongs] = useState([]);
@@ -28,19 +29,19 @@ function App() {
             };
 
             storage.webSocket.onmessage = (event) => {
-                const object = JSON.parse(event.data);
+                const response = JSON.parse(event.data);
                 const curSongs = storageRef.current.songs;
-                switch (object.request) {
+                switch (response.request) {
                     case "song-response": {
-                        const id = curSongs.findIndex(song => song.trackID === object.song.trackID);
+                        const id = curSongs.findIndex(song => song.trackID === response.song.trackID);
                         if (id !== -1) {
                             storageRef.current.setSongs(prevSongs => {
                                 const updatedSongs = [...prevSongs];
-                                updatedSongs[id] = object.song;
+                                updatedSongs[id] = response.song;
                                 return updatedSongs;
                             });
                         } else {
-                            storageRef.current.setSongs(prevSongs => [...prevSongs, object.song]);
+                            storageRef.current.setSongs(prevSongs => [...prevSongs, response.song]);
                         }
                         const el = document.querySelector(".content");
 
@@ -57,22 +58,43 @@ function App() {
                     case "song-update":
                         storageRef.current.setSongs(prevSongs => {
                             return prevSongs.map(song => {
-                                if (song.trackID === object.song.trackID) {
-                                    console.log("Updated song: ", object.song);
-                                    return object.song;
+                                if (song.trackID === response.song.trackID) {
+                                    if (response.song.coverURI === null || !response.song.coverURI) {
+                                        response.song.coverURI = "/assets/images/svg/questionmark.svg";
+                                    }
+                                    console.log("Updated song: ", response.song);
+                                    return response.song;
                                 }
                                 return song;
                             });
                         });
                         break;
+                    case "push-database": {
+                        if (response.status === "no-missmatch") {
+                            Swal.fire({
+                                title: "Songs successfully pushed to database",
+                                icon: "success"
+                            });
+                            storage.webSocket.send(JSON.stringify({
+                                request: "clear-songs"
+                            }));
+                        } else {
+                            Swal.fire({
+                                title: "There are still some missmatches",
+                                text: "Please fix the songs and try again (" + response.songs.length + " songs)",
+                            })
+                        }
+                        break;
+                    }
                     default:
                         break;
                 }
             };
 
-            storage.webSocket.onclose = () => {
+            storage.webSocket.onclose = async () => {
                 console.log("WebSocket closed. Attempting to reconnect...");
-                reconnectWebSocket();
+                await new Promise(resolve => setTimeout(resolve, 5000));
+                window.location.reload();
             };
 
             storage.webSocket.onerror = (error) => {
@@ -81,18 +103,7 @@ function App() {
             };
         }
 
-        function reconnectWebSocket() {
-            storage.webSocket = new WebSocket("wss://redreaperlp.de/api/ws/");
-            initializeWebSocket();
-        }
-
         initializeWebSocket();
-
-        return () => {
-            if (storage.webSocket) {
-                storage.webSocket.close();
-            }
-        };
     }, [ws]);
 
     useEffect(() => {

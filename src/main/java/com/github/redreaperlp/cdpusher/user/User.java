@@ -90,41 +90,15 @@ public class User {
         return searching;
     }
 
-    private enum Request {
-        GET("get"),
-        ADD("add"),
-        UPDATE("update"),
-        SEARCH("search"),
-        REMOVE("remove"),
-        LOGIN("login"),
-        CLEAR_SONGS("clear-songs"),
-        UNKNOWN("unknown");
-
-        private final String request;
-
-        Request(String request) {
-            this.request = request;
-        }
-
-        public String getRequest() {
-            return request;
-        }
-
-        public static Request fromString(String request) {
-            for (Request r : Request.values()) {
-                if (r.request.equals(request)) {
-                    return r;
-                }
-            }
-            return UNKNOWN;
-        }
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof User user) {
             return user.username.equals(username);
         }
         return false;
+    }
+
+    public List<SongData> allSongs() {
+        return songs;
     }
 }

@@ -1,5 +1,6 @@
 package com.github.redreaperlp.cdpusher;
 
+import com.github.redreaperlp.cdpusher.database.DatabaseManager;
 import com.github.redreaperlp.cdpusher.http.DiscOgsSearch;
 import com.github.redreaperlp.cdpusher.user.User;
 import com.github.redreaperlp.cdpusher.util.logger.types.InfoPrinter;
@@ -16,8 +17,7 @@ public class DiscInformation {
     private String[] labels;
     private String resourceURL;
 
-    //    private long trackidCounter = DatabaseManager.getInstance().getHighestID();
-    private long trackidCounter = 0;
+    private long trackidCounter = DatabaseManager.getInstance().getHighestID();
 
     private final List<List<TrackInformation>> songs = new ArrayList<>();
 
