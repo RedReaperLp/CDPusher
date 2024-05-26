@@ -54,7 +54,7 @@ function Content({storage}) {
                     className += " song__missmatch";
                 }
                 if (song.cover_uri === null) {
-                    song.cover_uri = "https://redreaperlp.de/assets/images/svg/questionmark.svg";
+                    song.cover_uri = "/assets/images/svg/questionmark.svg";
                 }
                 return (
                     <div className={className} key={song.song_id} onClick={() => openPopup(song)}>

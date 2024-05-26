@@ -1,33 +1,40 @@
 package com.github.redreaperlp.cdpusher.hibernate;
 
 import com.github.redreaperlp.cdpusher.data.DiscOGsSong;
-import com.github.redreaperlp.cdpusher.data.SongData;
 import com.github.redreaperlp.cdpusher.http.DiscOgsSearch;
 import com.github.redreaperlp.cdpusher.user.User;
+import com.github.redreaperlp.cdpusher.util.logger.types.ErrorPrinter;
 import com.github.redreaperlp.cdpusher.util.logger.types.InfoPrinter;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
 @Table(name = "discs")
-public class DiscInformation {
+public class DiscInformation implements Serializable {
     @Id
-    private long id = 0;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @Column(name = "country")
     private String country;
+    @Column(name = "year")
     private String year;
+    @Column(name = "title")
     private String title;
+    @Column(name = "label")
     private String label;
+    @Column(name = "resource_url")
     private String resourceURL;
-    @OneToMany()
+
+    @OneToMany(mappedBy = "discInformation", fetch = FetchType.EAGER)
     private List<Song> songs;
 
-    public DiscInformation() {}
+    public DiscInformation() {
+    }
 
     public DiscInformation(JSONObject requestResponse) {
         if (requestResponse.has("country")) this.country = requestResponse.getString("country");
@@ -104,5 +111,15 @@ public class DiscInformation {
     @Override
     public String toString() {
         return toJSON().toString();
+    }
+
+    public void pushToDB() {
+        try (var session = HibernateSession.getInstance().getSessionFactory().openSession()) {
+            session.beginTransaction();
+            session.persist(this);
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            new ErrorPrinter().appendException(e).print();
+        }
     }
 }

@@ -4,7 +4,7 @@ import com.github.redreaperlp.cdpusher.hibernate.DiscInformation;
 import com.github.redreaperlp.cdpusher.hibernate.Song;
 import com.github.redreaperlp.cdpusher.data.SongData;
 import com.github.redreaperlp.cdpusher.util.logger.types.TestPrinter;
-import de.redreaperlp.db.hibernate.HibernateSession;
+import com.github.redreaperlp.cdpusher.hibernate.HibernateSession;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -110,14 +110,11 @@ public class User {
         for (SongData song : this.songs) {
             if (song instanceof Song song1) {
                 songs.add(song1);
+                song1.setDiscInformation(disc);
             }
         }
         disc.setSongs(songs);
-        try (var session = HibernateSession.getInstance().getSessionFactory().openSession()) {
-            session.beginTransaction();
-            session.persist(disc);
-            session.getTransaction().commit();
-        };
+        disc.pushToDB();
     }
 
     public void setDisc(DiscInformation disc) {

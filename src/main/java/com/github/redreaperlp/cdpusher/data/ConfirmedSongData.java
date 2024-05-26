@@ -14,8 +14,8 @@ public class ConfirmedSongData extends SongData {
         }
     }
 
-    public ConfirmedSongData(long songID, String title, String[] artists, String album, int trackNo, int year, int discNo, long timeInSeconds, String imageURI) {
-        super(songID, title, artists, album, trackNo, year, discNo, timeInSeconds, imageURI);
+    public ConfirmedSongData(long songID, String title, String artist, String album, int trackNo, int year, int discNo, long timeInSeconds, String imageURI) {
+        super(songID, title, artist, album, trackNo, year, discNo, timeInSeconds, imageURI);
     }
 
     public boolean isSpotifyMissmatch() {

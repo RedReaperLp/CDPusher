@@ -9,7 +9,7 @@ function App() {
     const [songs, setSongs] = useState([]);
     const [render, setRender] = useState(false);
     const [discInfo, setDiscInfo] = useState({});
-    const ws = useMemo(() => new WebSocket("wss://redreaperlp.de/api/ws/"), []); // Initialize WebSocket
+    const ws = useMemo(() => new WebSocket("ws://" + window.location.hostname + "/api/ws/"), []); // Initialize WebSocket
     const username = "RerLp";
     const storageRef = useRef({
         songs: songs,

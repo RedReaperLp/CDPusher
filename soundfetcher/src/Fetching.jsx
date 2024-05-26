@@ -1,5 +1,5 @@
 export async function fetchSongs(username) {
-    return await fetch("https://redreaperlp.de/api/user/" + username, {
+    return await fetch("/api/user/" + username, {
         method: "GET",
         headers: {
             "Content-Type": "application/json"

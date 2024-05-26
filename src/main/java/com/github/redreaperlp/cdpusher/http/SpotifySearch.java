@@ -32,7 +32,7 @@ public class SpotifySearch {
         Matcher matcher = bracketRemover.matcher(title);
         title = matcher.replaceAll("");
         try {
-            String prepared = URLEncoder.encode((title + (information.getArtists().length > 0 ? " - " + information.getArtists()[0] : "")));
+            String prepared = URLEncoder.encode((title + (information.getArtist() != null ? " - " + information.getArtist() : "")));
             String req = String.format(searchURL, prepared);
 
             HttpRequest request = HttpRequest.newBuilder(new URI(req)).GET().header("Authorization", "Bearer " + SpotifyAuthentication.getInstance().getBearerToken()).build();
@@ -74,7 +74,7 @@ public class SpotifySearch {
             String imageURI = response.getJSONObject("album").getJSONArray("images").getJSONObject(0).getString("url");
             String name = response.getString("name");
 
-            return new Song(songID, name, artists, album, 0, 0, durationMs, year, imageURI);
+            return new Song(songID, name, artists[0], album, 0, 0, durationMs, year, imageURI);
         } catch (URISyntaxException | IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }

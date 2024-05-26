@@ -1,4 +1,4 @@
-package de.redreaperlp.db.hibernate;
+package com.github.redreaperlp.cdpusher.hibernate;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;

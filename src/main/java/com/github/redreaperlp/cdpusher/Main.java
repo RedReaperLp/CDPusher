@@ -10,7 +10,7 @@ import com.github.redreaperlp.cdpusher.util.FileAccessor;
 import com.github.redreaperlp.cdpusher.util.enums.responses.CacheControl;
 import com.github.redreaperlp.cdpusher.util.enums.responses.ContentTypes;
 import com.github.redreaperlp.cdpusher.util.logger.Loggers;
-import de.redreaperlp.db.hibernate.HibernateSession;
+import com.github.redreaperlp.cdpusher.hibernate.HibernateSession;
 import io.javalin.Javalin;
 import io.javalin.plugin.bundled.CorsPluginConfig;
 import org.json.JSONObject;

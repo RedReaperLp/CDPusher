@@ -1,11 +1,13 @@
 package com.github.redreaperlp.cdpusher.data;
 
+import com.mysql.cj.xdevapi.JsonArray;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public abstract class SongData {
     public long songID;
     public String title;
-    public String[] artists;
+    public String artist;
     public String album;
     public int trackNo;
     public int year;
@@ -18,7 +20,7 @@ public abstract class SongData {
     public SongData(SongData songData) {
         this.songID = songData.songID;
         this.title = songData.title;
-        this.artists = songData.artists;
+        this.artist = songData.artist;
         this.album = songData.album;
         this.trackNo = songData.trackNo;
         this.year = songData.year;
@@ -28,10 +30,10 @@ public abstract class SongData {
         this.spotifySearch = songData.spotifySearch;
     }
 
-    public SongData(long songID, String title, String[] artists, String album, int trackNo, int year, int discNo, long timeInSeconds, String imageURI) {
+    public SongData(long songID, String title, String artist, String album, int trackNo, int year, int discNo, long timeInSeconds, String imageURI) {
         this.songID = songID;
         this.title = title;
-        this.artists = artists;
+        this.artist = artist;
         this.album = album;
         this.trackNo = trackNo;
         this.year = year;
@@ -44,7 +46,8 @@ public abstract class SongData {
         return new JSONObject()
                 .put(SongDataKey.SONG_ID.getKey(), songID)
                 .put(SongDataKey.TITLE.getKey(), title)
-                .put(SongDataKey.ARTISTS.getKey(), artists)
+                .put(SongDataKey.ARTISTS.getKey(), new JSONArray()
+                        .put(artist))
                 .put(SongDataKey.ALBUM.getKey(), album)
                 .put(SongDataKey.TRACK_NO.getKey(), trackNo)
                 .put(SongDataKey.YEAR.getKey(), year)
@@ -62,8 +65,8 @@ public abstract class SongData {
         return title;
     }
 
-    public String[] getArtists() {
-        return artists;
+    public String getArtist() {
+        return artist;
     }
 
     public String getAlbum() {
@@ -102,8 +105,8 @@ public abstract class SongData {
         this.title = title;
     }
 
-    public void setArtists(String[] artists) {
-        this.artists = artists;
+    public void setArtist(String artists) {
+        this.artist = artists;
     }
 
     public void setAlbum(String album) {

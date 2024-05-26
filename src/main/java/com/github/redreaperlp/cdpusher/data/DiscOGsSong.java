@@ -2,6 +2,7 @@ package com.github.redreaperlp.cdpusher.data;
 
 import com.github.redreaperlp.cdpusher.hibernate.Song;
 import com.github.redreaperlp.cdpusher.http.SpotifySearch;
+import com.github.redreaperlp.cdpusher.util.logger.types.ErrorPrinter;
 import com.github.redreaperlp.cdpusher.util.logger.types.TestPrinter;
 import org.json.JSONObject;
 
@@ -29,10 +30,7 @@ public class DiscOGsSong extends SongData {
         this.title = data.getString("title");
         try {
             var arr = data.getJSONArray("artists");
-            this.artists = new String[arr.length()];
-            for (int i = 0; i < arr.length(); i++) {
-                this.artists[i] = arr.getJSONObject(i).getString("name");
-            }
+            this.artist = arr.getJSONObject(0).getString("name");
         } catch (Exception e) {
             this.spotifySearch = false;
         }
@@ -58,7 +56,7 @@ public class DiscOGsSong extends SongData {
 
             var song = new Song(this);
             song.setTitle(title);
-            song.setArtists(artists);
+            song.setArtist(artists[0]);
             song.setAlbum(albumName);
             song.setYear(Integer.parseInt(albumReleaseDate.split("-")[0]));
             song.setTimeInSeconds(duration);
