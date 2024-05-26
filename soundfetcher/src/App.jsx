@@ -8,12 +8,15 @@ import Swal from "sweetalert2";
 function App() {
     const [songs, setSongs] = useState([]);
     const [render, setRender] = useState(false);
-    const username = "RerLp";
+    const [discInfo, setDiscInfo] = useState({});
     const ws = useMemo(() => new WebSocket("wss://redreaperlp.de/api/ws/"), []); // Initialize WebSocket
+    const username = "RerLp";
     const storageRef = useRef({
         songs: songs,
         setSongs: setSongs,
-        webSocket: ws
+        webSocket: ws,
+        discInfo: discInfo,
+        setDiscInfo: setDiscInfo
     });
 
     useEffect(() => {
@@ -32,8 +35,15 @@ function App() {
                 const response = JSON.parse(event.data);
                 const curSongs = storageRef.current.songs;
                 switch (response.request) {
+                    case "disc-info": {
+                        storageRef.current.setDiscInfo(response.info);
+                        break;
+                    }
                     case "song-response": {
-                        const id = curSongs.findIndex(song => song.trackID === response.song.trackID);
+                        const id = curSongs.findIndex(song => song.song_id === response.song.song_id);
+                        if (response.song.song_cover_uri === null || !response.song.song_cover_uri) {
+                            response.song.song_cover_uri = "/assets/images/svg/questionmark.svg";
+                        }
                         if (id !== -1) {
                             storageRef.current.setSongs(prevSongs => {
                                 const updatedSongs = [...prevSongs];
@@ -58,9 +68,9 @@ function App() {
                     case "song-update":
                         storageRef.current.setSongs(prevSongs => {
                             return prevSongs.map(song => {
-                                if (song.trackID === response.song.trackID) {
-                                    if (response.song.coverURI === null || !response.song.coverURI) {
-                                        response.song.coverURI = "/assets/images/svg/questionmark.svg";
+                                if (song.song_id === response.song.song_id) {
+                                    if (response.song.song_cover_uri === null || !response.song.song_cover_uri) {
+                                        response.song.song_cover_uri = "/assets/images/svg/questionmark.svg";
                                     }
                                     console.log("Updated song: ", response.song);
                                     return response.song;
@@ -110,14 +120,17 @@ function App() {
         storageRef.current = {
             setSongs: setSongs,
             songs: songs,
-            webSocket: storageRef.current.webSocket
+            webSocket: storageRef.current.webSocket,
+            discInfo: discInfo,
+            setDiscInfo: setDiscInfo
         };
         setRender(!render);
     }, [songs]);
 
     useEffect(() => {
         fetchSongs(username).then(fetchedSongs => {
-            setSongs(fetchedSongs);
+            setSongs(fetchedSongs.songs);
+            setDiscInfo(fetchedSongs.disc);
         });
     }, []);
 

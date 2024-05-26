@@ -1,7 +1,7 @@
 package com.github.redreaperlp.cdpusher.http;
 
-import com.github.redreaperlp.cdpusher.Song;
-import com.github.redreaperlp.cdpusher.TrackInformation;
+import com.github.redreaperlp.cdpusher.data.DiscOGsSong;
+import com.github.redreaperlp.cdpusher.hibernate.Song;
 import com.github.redreaperlp.cdpusher.spotify.SpotifyAuthentication;
 import org.json.JSONObject;
 
@@ -17,8 +17,6 @@ public class SpotifySearch {
     private String searchURL = "https://api.spotify.com/v1/search?q=%s&type=track&limit=1";
     private String tackURL = "https://api.spotify.com/v1/tracks/%s";
 
-    private static long songIDCounter = 0;
-
     private static SpotifySearch instance;
 
     private SpotifySearch() {
@@ -28,7 +26,7 @@ public class SpotifySearch {
         return instance == null ? instance = new SpotifySearch() : instance;
     }
 
-    public JSONObject finalizeSearch(TrackInformation information) {
+    public JSONObject finalizeSearch(DiscOGsSong information) {
         String title = information.getTitle();
         Pattern bracketRemover = Pattern.compile("\\(.*?\\)");
         Matcher matcher = bracketRemover.matcher(title);
@@ -70,10 +68,13 @@ public class SpotifySearch {
                 artists[i] = response.getJSONArray("artists").getJSONObject(i).getString("name");
             }
 
-            return new Song(songID, response.getString("name"), artists,
-                    response.getJSONObject("album").getString("name"), 0, 0, response.getLong("duration_ms") / 1000,
-                    Integer.parseInt(response.getJSONObject("album").getString("release_date").split("-")[0]), 0,
-                    response.getJSONObject("album").getJSONArray("images").getJSONObject(0).getString("url"));
+            String album = response.getJSONObject("album").getString("name");
+            long durationMs = response.getLong("duration_ms") / 1000;
+            int year = Integer.parseInt(response.getJSONObject("album").getString("release_date").split("-")[0]);
+            String imageURI = response.getJSONObject("album").getJSONArray("images").getJSONObject(0).getString("url");
+            String name = response.getString("name");
+
+            return new Song(songID, name, artists, album, 0, 0, durationMs, year, imageURI);
         } catch (URISyntaxException | IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }

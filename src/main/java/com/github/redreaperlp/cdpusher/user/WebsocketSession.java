@@ -1,10 +1,8 @@
 package com.github.redreaperlp.cdpusher.user;
 
-import com.github.redreaperlp.cdpusher.DiscInformation;
-import com.github.redreaperlp.cdpusher.Song;
-import com.github.redreaperlp.cdpusher.TrackInformation;
-import com.github.redreaperlp.cdpusher.data.DataKeys;
-import com.github.redreaperlp.cdpusher.data.SongData;
+import com.github.redreaperlp.cdpusher.data.*;
+import com.github.redreaperlp.cdpusher.hibernate.DiscInformation;
+import com.github.redreaperlp.cdpusher.hibernate.Song;
 import com.github.redreaperlp.cdpusher.http.DiscOgsSearch;
 import com.github.redreaperlp.cdpusher.http.SpotifySearch;
 import io.javalin.websocket.WsContext;
@@ -37,7 +35,7 @@ public class WebsocketSession implements WebSocketListener {
                 case UPDATE -> {
                     if (checkUser()) return;
                     String songURI = message.getString("uri");
-                    long songID = message.getLong(DataKeys.SongData.TRACK_ID.getKey());
+                    long songID = message.getLong(SongDataKey.SONG_ID.getKey());
                     Song song = SpotifySearch.getInstance().searchSong(songID, songURI);
                     user.setSong(song);
                 }
@@ -48,6 +46,10 @@ public class WebsocketSession implements WebSocketListener {
                     new Thread(() -> {
                         String ean = message.getString("ean").replace(" ", "");
                         DiscInformation disc = DiscOgsSearch.getInstance().searchEan(ean);
+                        user.setDisc(disc);
+                        user.broadcastMessage(new JSONObject()
+                                .put("request", "disc-info")
+                                .put("info", disc.toJSON()).toString());
                         disc.loadTracks(user);
                         user.setSearching(false);
                     }, "SongSearch").start();
@@ -57,11 +59,13 @@ public class WebsocketSession implements WebSocketListener {
                 case USE_DISCOGS -> {
                     if (checkUser()) return;
                     var res = user.allSongs().stream().filter(s -> {
-                        return s.getDiscNo() == message.getInt("discNo") && s.getTrackNo() == message.getInt("trackNo");
+                        return s.getDiscNo() == message.getInt(SongDataKey.DISC_NO.getKey()) && s.getTrackNo() == message.getInt(SongDataKey.TRACK_NO.getKey());
                     }).findFirst();
                     if (res.isPresent()) {
-                        if (res.get() instanceof TrackInformation info) {
-                            var song = info.toSong();
+                        if (res.get() instanceof SongMissmatch info) {
+                            var song = new Song(info);
+                            song.spotifySearch = true;
+                            song.spotifyMissmatch = false;
                             user.setSong(song);
                         }
                     } else {
@@ -72,9 +76,11 @@ public class WebsocketSession implements WebSocketListener {
                 case PUSH_DATABASE -> {
                     if (checkUser()) return;
                     List<SongData> songs = user.allSongs().stream()
-                            .filter(s -> s instanceof TrackInformation)
+                            .filter(s -> s instanceof SongMissmatch)
                             .toList();
                     if (songs.isEmpty()) {
+                        user.finish();
+                        user.clearSongs();
                         send(new JSONObject().put("request", "push-database")
                                 .put("status", "no-missmatch").toString());
                     } else {

@@ -1,7 +1,7 @@
 package com.github.redreaperlp.cdpusher.http;
 
-import com.github.redreaperlp.cdpusher.DiscInformation;
-import com.github.redreaperlp.cdpusher.TrackInformation;
+import com.github.redreaperlp.cdpusher.hibernate.DiscInformation;
+import com.github.redreaperlp.cdpusher.data.DiscOGsSong;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DiscOgsSearch {
     private final String consumerKey = "nlWRgBrgZnFeOuwDqXbu";
@@ -49,21 +51,21 @@ public class DiscOgsSearch {
         }
     }
 
-    public TrackInformation lookupTrack(TrackInformation information) {
-
-        return null;
-    }
-
-    public JSONArray searchDiscTracks(DiscInformation discInformation) {
+    public List<DiscOGsSong> searchDiscTracks(DiscInformation discInformation) {
         URI uri = URI.create(discInformation.getResourceURL());
         try {
             HttpRequest request = HttpRequest.newBuilder(uri).GET().build();
             JSONObject res = new JSONObject(CliManager.send(request));
-            if (!res.has("tracklist")) return null;
-            return res.getJSONArray("tracklist");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
+            List<DiscOGsSong> songs = new ArrayList<>();
+            if (!res.has("tracklist")) return songs;
+
+            var tracklist = res.getJSONArray("tracklist");
+            for (int i = 0; i < tracklist.length(); i++) {
+                DiscOGsSong t = new DiscOGsSong((JSONObject) tracklist.get(i), i);
+                songs.add(t);
+            }
+            return songs;
+        } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }

@@ -1,8 +1,10 @@
 package com.github.redreaperlp.cdpusher.user;
 
-import com.github.redreaperlp.cdpusher.Song;
+import com.github.redreaperlp.cdpusher.hibernate.DiscInformation;
+import com.github.redreaperlp.cdpusher.hibernate.Song;
 import com.github.redreaperlp.cdpusher.data.SongData;
 import com.github.redreaperlp.cdpusher.util.logger.types.TestPrinter;
+import de.redreaperlp.db.hibernate.HibernateSession;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -17,6 +19,7 @@ public class User {
     private LocalDateTime dumpUser = LocalDateTime.now().plusMinutes(1);
     private final List<WebsocketSession> sessions = new ArrayList<>();
     private final String username;
+    private DiscInformation disc;
 
     private boolean searching = false;
 
@@ -44,7 +47,7 @@ public class User {
         }
     }
 
-    private void broadcastMessage(String string) {
+    public void broadcastMessage(String string) {
         sessions.forEach(session -> session.send(string));
     }
 
@@ -100,5 +103,28 @@ public class User {
 
     public List<SongData> allSongs() {
         return songs;
+    }
+
+    public void finish() {
+        List<Song> songs = new ArrayList<>();
+        for (SongData song : this.songs) {
+            if (song instanceof Song song1) {
+                songs.add(song1);
+            }
+        }
+        disc.setSongs(songs);
+        try (var session = HibernateSession.getInstance().getSessionFactory().openSession()) {
+            session.beginTransaction();
+            session.persist(disc);
+            session.getTransaction().commit();
+        };
+    }
+
+    public void setDisc(DiscInformation disc) {
+        this.disc = disc;
+    }
+
+    public DiscInformation getDisc() {
+        return disc;
     }
 }

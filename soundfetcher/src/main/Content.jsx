@@ -50,22 +50,22 @@ function Content({storage}) {
             {testEans()}
             {storage.songs && storage.songs.map((song) => {
                 let className = "song";
-                if (song.spotifyMissmatch || !song.spotifySearch) {
+                if (song.spotify_missmatch || !song.spotify_search) {
                     className += " song__missmatch";
                 }
-                if (song.coverURI === null) {
-                    song.coverURI = "https://redreaperlp.de/assets/images/svg/questionmark.svg";
+                if (song.cover_uri === null) {
+                    song.cover_uri = "https://redreaperlp.de/assets/images/svg/questionmark.svg";
                 }
                 return (
-                    <div className={className} key={song.trackID} onClick={() => openPopup(song)}>
+                    <div className={className} key={song.song_id} onClick={() => openPopup(song)}>
                         <div className="title__cover">
                             <img className={"song__cover"} height={"40px"} width={"40px"}
-                                 src={song.coverURI}
+                                 src={song.song_cover_uri}
                                  alt="cover"/>
-                            <a className={"song__title"}>{song.title}</a>
+                            <a className={"song__title"}>{song.song_title}</a>
                         </div>
-                        <a className={"song__artist"}>{song.artists && song.artists.join("\n")}</a>
-                        <a className={"song__album"}>{song.album}</a>
+                        <a className={"song__artist"}>{song.song_artists && song.song_artists.join("\n")}</a>
+                        <a className={"song__album"}>{song.song_album}</a>
                     </div>
                 )
             })}

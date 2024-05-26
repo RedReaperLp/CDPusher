@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="Root" createEmptyFolders="true" confirmBeforeUploading="false" confirmBeforeDeletion="false" autoUploadExternalChanges="true">
+  <component name="PublishConfigData" autoUpload="Always" serverName="Root" createEmptyFolders="true" exclude=".svn;.cvs;.idea;.DS_Store;.git;.hg;*.hprof;*.pyc;.gradle" confirmBeforeUploading="false" confirmBeforeDeletion="false" autoUploadExternalChanges="true">
     <option name="confirmBeforeDeletion" value="false" />
     <option name="confirmBeforeUploading" value="false" />
     <serverData>

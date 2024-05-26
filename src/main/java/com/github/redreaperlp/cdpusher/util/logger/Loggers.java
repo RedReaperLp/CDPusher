@@ -22,5 +22,9 @@ public class Loggers {
         eclipseLogger.getAppender("ColorLogger").start();
         new SuccessPrinter().append("Loggers loaded").print();
 
+        Logger hibernateLogger = (Logger) LoggerFactory.getLogger("org.hibernate");
+        hibernateLogger.addAppender(new ColorLoggerFactory());
+        hibernateLogger.getAppender("ColorLogger").start();
+
     }
 }

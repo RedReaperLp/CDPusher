@@ -2,18 +2,18 @@ import Swal from "sweetalert2";
 import "./Popup.scss";
 
 function useDiscOGs(song, storage, closePopup) {
-    console.log(storage);
+    console.log(song);
     storage.webSocket.send(JSON.stringify({
+        song_disc_no: song.song_disc_no,
         request: "use-discogs",
-        discNo: song.discNo,
-        trackNo: song.trackNo,
+        song_track_no: song.song_track_no,
     }))
     closePopup();
 }
 
 export function Popup({song, storage, closePopup}) {
-    const id = song.trackID;
-    const index = storage.songs.findIndex((song) => song.trackID === id);
+    const id = song.song_id;
+    const index = storage.songs.findIndex((song) => song.song_id === id);
 
     if (index === -1) {
         return (<></>);
@@ -31,7 +31,7 @@ export function Popup({song, storage, closePopup}) {
     }
 
     function fireSwal() {
-        window.open("https://open.spotify.com/search/" + song.title + " - " + (song.artists && song.artists[0]))
+        window.open("https://open.spotify.com/search/" + song.song_title + " - " + (song.song_artists && song.song_artists[0]))
 
         Swal.fire({
             title: "Enter Spotify URL",
@@ -51,7 +51,7 @@ export function Popup({song, storage, closePopup}) {
                 JSON.stringify({
                     request: "update",
                     uri: value.value,
-                    trackID: song.trackID,
+                    song_id: song.song_id,
                 })
             );
         }).then(() => {
@@ -60,12 +60,13 @@ export function Popup({song, storage, closePopup}) {
     }
 
     function resolveButton() {
-        if (song.spotifySearch && !song.spotifyMissmatch) {
+        if (song.spotify_search && !song.spotify_missmatch) {
             return <button className="popup__button" onClick={() => closePopup()}>Close</button>;
         } else {
             return <>
                 <button className="popup__button" onClick={() => fireSwal()}>Search in Spotify</button>
-                <button className="popup__button" onClick={() => useDiscOGs(song, storage, closePopup)}>Use DiscOGs</button>
+                <button className="popup__button" onClick={() => useDiscOGs(song, storage, closePopup)}>Use DiscOGs
+                </button>
             </>
         }
     }
@@ -74,31 +75,32 @@ export function Popup({song, storage, closePopup}) {
         <div className="popup__container">
             <div className="popup__content">
                 <div className="popup__cover">
-                    <img height="180px" src={song.coverURI === null
+                    <img height="180px" src={song.song_cover_uri === null
                         ? "/assets/images/svg/questionmark.svg"
-                        : song.coverURI} width="180px" alt={"Song Cover"}/>
+                        : song.song_cover_uri} width="180px" alt={"Song Cover"}/>
                 </div>
                 <div className="popup__info">
                     <div className="popup__separator">
                         <div className="popup__row">
                             <div className="popup__upper">
-                                <h1 className="popup__title overflow">{song.title}</h1>
-                                <p className={"overflow"}><b>Album:</b> {song.album ? song.album : "Unbekannt"}
+                                <h1 className="popup__title overflow">{song.song_title}</h1>
+                                <p className={"overflow"}>
+                                    <b>Album:</b> {song.song_album ? song.song_album : "Unbekannt"}
                                 </p>
                             </div>
                             <div className="popup__lower">
-                                <p className="release_year">{song.year ? song.year : "Unbekannt"}</p>
+                                <p className="release_year">{song.song_year ? song.song_year : "Unbekannt"}</p>
                             </div>
                         </div>
                         <div className="popup__row">
                             <div className="popup__upper">
                                 <div className="popup__space-around">
-                                    <p>CD: {song.discNo}</p>
-                                    <p>Track: {song.trackNo}</p>
+                                    <p>CD: {song.song_disc_no}</p>
+                                    <p>Track: {song.song_track_no}</p>
                                 </div>
                             </div>
                             <div className="popup__lower">
-                                <p>Interne CD Nummer: {song.internalDiscNo ? song.internalDiscNo : "Unbekannt"}</p>
+                                <p>Interne CD Nummer: {storage.discInfo.id}</p>
                             </div>
                         </div>
                     </div>
@@ -106,8 +108,8 @@ export function Popup({song, storage, closePopup}) {
                     <div className="popup__separator popup__half-height">
                         <div className="popup__row">
                             <div className="popup__upper">
-                                <p className="duration">{Math.floor(song.duration / 60) +
-                                    ":" + String.prototype.padStart.call(song.duration % 60, 2, "0") +
+                                <p className="duration">{Math.floor(song.song_duration / 60) +
+                                    ":" + String.prototype.padStart.call(song.song_duration % 60, 2, "0") +
                                     " Minuten"}</p>
                             </div>
                         </div>
@@ -115,11 +117,12 @@ export function Popup({song, storage, closePopup}) {
                             <div className="popup__lower">
                                 <p className="composer">Spotify State</p>
                                 <div className="popup__indicator"
-                                     style={{background: resolveColor(song.spotifySearch, song.spotifyMissmatch)}}></div>
+                                     style={{background: resolveColor(song.spotify_search, song.spotify_missmatch)}}></div>
                             </div>
                         </div>
                     </div>
-                    <div className="popup__separator popup__button_div popup__half-height popup__full-width popup__center">
+                    <div
+                        className="popup__separator popup__button_div popup__half-height popup__full-width popup__center">
                         {resolveButton()}
                     </div>
                 </div>
