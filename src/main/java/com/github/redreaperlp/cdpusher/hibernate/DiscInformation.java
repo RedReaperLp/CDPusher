@@ -16,6 +16,7 @@ import java.util.List;
 @Table(name = "discs")
 public class DiscInformation implements Serializable {
     @Id
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
@@ -57,6 +58,10 @@ public class DiscInformation implements Serializable {
             var validation = song.spotifySearch();
             requester.addSong(validation);
         }
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getCountry() {
@@ -121,5 +126,29 @@ public class DiscInformation implements Serializable {
         } catch (Exception e) {
             new ErrorPrinter().appendException(e).print();
         }
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public void setResourceURL(String resourceURL) {
+        this.resourceURL = resourceURL;
     }
 }

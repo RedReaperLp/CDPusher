@@ -10,7 +10,6 @@
 		<property name="hibernate.connection.password">cdpusher</property>
 		<property name="hibernate.hbm2ddl.auto">update</property>
 		<property name="hibernate.show_sql">false</property>
-
 		<mapping class="com.github.redreaperlp.cdpusher.hibernate.DiscInformation"/>
 		<mapping class="com.github.redreaperlp.cdpusher.hibernate.Song"/>
 	</session-factory>

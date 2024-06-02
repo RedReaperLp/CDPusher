@@ -3,6 +3,7 @@ package com.github.redreaperlp.cdpusher.http;
 import com.github.redreaperlp.cdpusher.data.DiscOGsSong;
 import com.github.redreaperlp.cdpusher.hibernate.Song;
 import com.github.redreaperlp.cdpusher.spotify.SpotifyAuthentication;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SpotifySearch {
-    private String searchURL = "https://api.spotify.com/v1/search?q=%s&type=track&limit=1";
+    private String searchURL = "https://api.spotify.com/v1/search?q=%s&type=track&limit=1&offset=0";
     private String tackURL = "https://api.spotify.com/v1/tracks/%s";
 
     private static SpotifySearch instance;
@@ -37,7 +38,12 @@ public class SpotifySearch {
 
             HttpRequest request = HttpRequest.newBuilder(new URI(req)).GET().header("Authorization", "Bearer " + SpotifyAuthentication.getInstance().getBearerToken()).build();
             JSONObject response = new JSONObject(CliManager.send(request)).getJSONObject("tracks");
-            JSONObject track = response.getJSONArray("items").getJSONObject(0);
+            JSONArray items = response.getJSONArray("items");
+            if (items.isEmpty()) {
+                information.setSpotifySearch(false);
+                return null;
+            }
+            JSONObject track = items.getJSONObject(0);
             return response;
         } catch (URISyntaxException | IOException | InterruptedException e) {
             throw new RuntimeException(e);

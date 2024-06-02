@@ -10749,7 +10749,10 @@ function Popup({ song, storage, closePopup }) {
   }
   function resolveButton() {
     if (song.spotify_search && !song.spotify_missmatch) {
-      return /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "popup__button", onClick: () => closePopup(), children: "Close" });
+      return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "popup__button", onClick: () => fireSwal(), children: "Patch" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "popup__button", onClick: () => closePopup(), children: "Close" })
+      ] });
     } else {
       return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "popup__button", onClick: () => fireSwal(), children: "Search in Spotify" }),
@@ -10903,20 +10906,28 @@ async function fetchSongs(username) {
     headers: {
       "Content-Type": "application/json"
     }
-  }).then((response) => response.json()).then((data) => {
+  }).then((response) => response.json()).then((res) => {
+    const data = res.songs;
+    const disc = res.disc;
     for (let i = 0; i < data.length; i++) {
-      if (!data[i].coverURI) {
-        data[i].coverURI = "/assets/images/svg/questionmark.svg";
+      if (!data[i].song_cover_uri) {
+        data[i].song_cover_uri = "/assets/images/svg/questionmark.svg";
       }
     }
-    return data;
+    return { songs: data, disc };
   }).catch((error) => console.error(error));
+}
+let wsString;
+if (window.location.hostname === "localhost") {
+  wsString = "ws://";
+} else {
+  wsString = "wss://";
 }
 function App() {
   const [songs, setSongs] = reactExports.useState([]);
   const [render, setRender] = reactExports.useState(false);
   const [discInfo, setDiscInfo] = reactExports.useState({});
-  const ws = reactExports.useMemo(() => new WebSocket("ws://" + window.location.hostname + "/api/ws/"), []);
+  const ws = reactExports.useMemo(() => new WebSocket(wsString + window.location.hostname + "/api/ws/"), []);
   const username = "RerLp";
   const storageRef = reactExports.useRef({
     songs,

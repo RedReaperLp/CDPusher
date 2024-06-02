@@ -6,13 +6,15 @@ export async function fetchSongs(username) {
         }
     })
         .then(response => response.json())
-        .then(data => {
+        .then(res => {
+            const data = res.songs;
+            const disc = res.disc;
             for (let i = 0; i < data.length; i++) {
-                if (!data[i].coverURI) {
-                    data[i].coverURI = "/assets/images/svg/questionmark.svg";
+                if (!data[i].song_cover_uri) {
+                    data[i].song_cover_uri = "/assets/images/svg/questionmark.svg";
                 }
             }
-            return data;
+            return {songs: data, disc: disc};
         })
         .catch(error => console.error(error));
 }

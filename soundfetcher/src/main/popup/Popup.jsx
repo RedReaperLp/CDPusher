@@ -61,7 +61,11 @@ export function Popup({song, storage, closePopup}) {
 
     function resolveButton() {
         if (song.spotify_search && !song.spotify_missmatch) {
-            return <button className="popup__button" onClick={() => closePopup()}>Close</button>;
+            return <>
+                <button className="popup__button" onClick={() => fireSwal()}>Patch</button>
+                <button className="popup__button" onClick={() => closePopup()}>Close</button>
+            </>
+                ;
         } else {
             return <>
                 <button className="popup__button" onClick={() => fireSwal()}>Search in Spotify</button>

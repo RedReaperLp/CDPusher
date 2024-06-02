@@ -39,7 +39,11 @@ public class DiscOGsSong extends SongData {
 
     public SongData spotifySearch() {
         if (this.spotifySearch) {
-            var track = SpotifySearch.getInstance().finalizeSearch(this).getJSONArray("items").getJSONObject(0);
+            JSONObject res = SpotifySearch.getInstance().finalizeSearch(this);
+            if (res == null) {
+                return new SongMissmatch(this, null);
+            }
+            var track = res.getJSONArray("items").getJSONObject(0);
             JSONObject album = track.getJSONObject("album");
 
             String title = track.getString("name").trim();

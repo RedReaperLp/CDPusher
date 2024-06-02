@@ -68,7 +68,6 @@ public class User {
             new TestPrinter().append("User " + username + " dumped").print();
             return true;
         }
-        new TestPrinter().append("Remaining time for " + username + " is " + (dumpUser.toLocalTime().toEpochSecond(LocalDate.MAX, ZoneOffset.UTC) - LocalDateTime.now().toLocalTime().toEpochSecond(LocalDate.MAX, ZoneOffset.UTC))).print();
         return false;
     }
 
@@ -82,7 +81,6 @@ public class User {
 
     public void addSession(WebsocketSession websocketSession) {
         sessions.add(websocketSession);
-        new TestPrinter().append("Added session to " + username).print();
     }
 
     public void setSearching(boolean searching) {
@@ -106,6 +104,10 @@ public class User {
     }
 
     public void finish() {
+        if (disc == null) {
+            broadcastMessage(new JSONObject().put("request", "error").put("message", "No disc information").toString());
+            return;
+        }
         List<Song> songs = new ArrayList<>();
         for (SongData song : this.songs) {
             if (song instanceof Song song1) {

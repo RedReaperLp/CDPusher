@@ -5,11 +5,18 @@ import Footer from "./footer/Footer.jsx";
 import {fetchSongs} from "./Fetching.jsx";
 import Swal from "sweetalert2";
 
+let wsString;
+if (window.location.hostname === "localhost") {
+    wsString = "ws://";
+} else {
+    wsString = "wss://";
+}
+
 function App() {
     const [songs, setSongs] = useState([]);
     const [render, setRender] = useState(false);
     const [discInfo, setDiscInfo] = useState({});
-    const ws = useMemo(() => new WebSocket("ws://" + window.location.hostname + "/api/ws/"), []); // Initialize WebSocket
+    const ws = useMemo(() => new WebSocket(wsString + window.location.hostname + "/api/ws/"), []); // Initialize WebSocket
     const username = "RerLp";
     const storageRef = useRef({
         songs: songs,
