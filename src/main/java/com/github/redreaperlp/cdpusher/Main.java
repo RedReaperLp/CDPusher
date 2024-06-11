@@ -24,8 +24,8 @@ public class Main {
     private static Main instance;
     public DatabaseConfiguration conf;
 
-    public boolean colored = true;
-    public boolean debug = false;
+    public static boolean colored = true;
+    public static boolean debug = false;
 
     public static Main getInstance() {
         return instance;

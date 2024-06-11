@@ -1,6 +1,7 @@
 package com.github.redreaperlp.cdpusher.util.logger;
 
 import com.github.redreaperlp.cdpusher.Main;
+import com.github.redreaperlp.cdpusher.util.WebhookManager;
 import com.github.redreaperlp.cdpusher.util.logger.types.MessagePart;
 
 import java.util.ArrayList;
@@ -67,15 +68,13 @@ public class PlainPrinter implements ColorLogger {
 
     public static String counter() {
         counter++;
-        String underspaces = "____";
+        StringBuilder underspaces = new StringBuilder("____");
         String sCounter = String.valueOf(counter);
         if (sCounter.length() > 3) {
-            for (int i = 0; i < sCounter.length() - 3; i++) {
-                underspaces += "_";
-            }
+            underspaces.append("_".repeat(sCounter.length() - 3));
         }
-        underspaces = underspaces.substring(0, underspaces.length() - sCounter.length());
-        return counter + underspaces;
+        underspaces = new StringBuilder(underspaces.substring(0, underspaces.length() - sCounter.length()));
+        return counter + underspaces.toString();
     }
 
     public MessagePart getType() {

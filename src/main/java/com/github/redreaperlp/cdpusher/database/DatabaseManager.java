@@ -32,9 +32,9 @@ public class DatabaseManager {
         new SuccessPrinter(new MessagePart("[Database Manager]")).append("Database Manager initialized").print();
     }
 
-    public long getHighestID() {
+    public long getHighestSongID() {
         try (Connection connection = getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("SELECT MAX(id) FROM cd_pusher.music");
+            PreparedStatement statement = connection.prepareStatement("SELECT MAX(id) FROM cdpusher.songs");
             if (statement.execute()) {
                 statement.getResultSet().next();
                 return statement.getResultSet().getLong(1);
@@ -57,5 +57,19 @@ public class DatabaseManager {
 
     public void close() {
         dataSource.close();
+    }
+
+    public long getHighestDiscID() {
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("SELECT MAX(id) FROM cdpusher.discs");
+            if (statement.execute()) {
+                statement.getResultSet().next();
+                return statement.getResultSet().getLong(1);
+            }
+            return 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }

@@ -1,0 +1,66 @@
+.content {
+  grid-area: content;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  overflow-x: hidden;
+}
+.content .song {
+  display: grid;
+  grid-template-columns: 40% 30% 30%;
+  grid-template-rows: 100%;
+  grid-template-areas: "title__cover song__artist song__album";
+  background: rgba(0, 0, 0, 0.2);
+  margin: 10px;
+  border-radius: 10px;
+  transition: all 0.3s ease-in-out;
+  animation: swal2-show 0.5s ease-in-out;
+}
+@keyframes swal2-show {
+  0% {
+    transform: scale(0.7);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.content .song .song__artist {
+  grid-area: song__artist;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+.content .song .song__album {
+  grid-area: song__album;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+.content .song__missmatch {
+  background: rgba(255, 0, 0, 0.5);
+}
+
+.title__cover {
+  grid-area: title__cover;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  padding: 10px;
+}
+.title__cover .song__cover {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+.title__cover .song__title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+/*# sourceMappingURL=Content.css.map */

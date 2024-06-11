@@ -27,4 +27,8 @@ public class MessagePart {
             message += " ";
         }
     }
+
+    public String uncolored() {
+        return message;
+    }
 }

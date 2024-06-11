@@ -1,5 +1,6 @@
 package com.github.redreaperlp.cdpusher.util.logger.types;
 
+import com.github.redreaperlp.cdpusher.util.WebhookManager;
 import com.github.redreaperlp.cdpusher.util.logger.Color;
 import com.github.redreaperlp.cdpusher.util.logger.PlainPrinter;
 
@@ -31,5 +32,13 @@ public class ErrorPrinter extends PlainPrinter {
             appendNewLine("    at " + trace.getClassName() + "." + trace.getMethodName() + "(" + trace.getFileName() + ":" + trace.getLineNumber() + ")", Color.RED);
         }
         return this;
+    }
+
+    @Override
+    public void print() {
+        super.print();
+        var uncolored = new StringBuilder();
+        messageParts.forEach(part -> uncolored.append(part.uncolored()));
+        WebhookManager.error(uncolored.toString());
     }
 }

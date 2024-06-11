@@ -16,8 +16,8 @@ import java.util.List;
 @Table(name = "discs")
 public class DiscInformation implements Serializable {
     @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "disc_id")
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(name = "country")
@@ -122,6 +122,9 @@ public class DiscInformation implements Serializable {
         try (var session = HibernateSession.getInstance().getSessionFactory().openSession()) {
             session.beginTransaction();
             session.persist(this);
+
+            getSongs().forEach(session::persist);
+
             session.getTransaction().commit();
         } catch (Exception e) {
             new ErrorPrinter().appendException(e).print();

@@ -4,11 +4,9 @@ import com.github.redreaperlp.cdpusher.data.ConfirmedSongData;
 import com.github.redreaperlp.cdpusher.data.SongData;
 import jakarta.persistence.*;
 
-import java.io.Serializable;
-
 @Entity
 @Table(name = "songs")
-public class Song extends ConfirmedSongData implements Serializable {
+public class Song extends ConfirmedSongData {
 
     public Song() {
     }
@@ -22,8 +20,6 @@ public class Song extends ConfirmedSongData implements Serializable {
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     public long getId() {
         return songID;
     }
@@ -33,7 +29,7 @@ public class Song extends ConfirmedSongData implements Serializable {
     }
 
     @ManyToOne
-    @JoinColumn(name = "discInformation")
+    @JoinColumn(name = "disc_id", referencedColumnName = "disc_id")
     private DiscInformation discInformation;
 
     @Override

@@ -1,16 +1,13 @@
 package com.github.redreaperlp.cdpusher.user;
 
+import com.github.redreaperlp.cdpusher.data.SongData;
 import com.github.redreaperlp.cdpusher.hibernate.DiscInformation;
 import com.github.redreaperlp.cdpusher.hibernate.Song;
-import com.github.redreaperlp.cdpusher.data.SongData;
 import com.github.redreaperlp.cdpusher.util.logger.types.TestPrinter;
-import com.github.redreaperlp.cdpusher.hibernate.HibernateSession;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 

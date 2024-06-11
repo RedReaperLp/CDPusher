@@ -24,6 +24,8 @@ dependencies {
     implementation("ch.qos.logback", "logback-classic", "1.4.11")
     implementation("org.hibernate", "hibernate-core", "6.5.0.CR1")
 
+    testImplementation("junit:junit:4.13.2")
+
 }
 
 tasks.withType<ShadowJar> {

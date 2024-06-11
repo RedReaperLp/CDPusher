@@ -4,7 +4,9 @@ import com.mysql.cj.xdevapi.JsonArray;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public abstract class SongData {
+import java.io.Serializable;
+
+public abstract class SongData implements Serializable {
     public long songID;
     public String title;
     public String artist;
