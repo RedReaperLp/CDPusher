@@ -1,16 +1,15 @@
-package com.github.redreaperlp.cdpusher.data;
+package com.github.redreaperlp.cdpusher.data.song;
 
 import org.json.JSONObject;
 
 public class ConfirmedSongData extends SongData {
-    public boolean spotifyMissmatch = false;
+    public boolean spotifyMismatch = false;
 
-    public ConfirmedSongData(){}
     public ConfirmedSongData(SongData songData) {
         super(songData);
         if (songData instanceof ConfirmedSongData confirmedSongData) {
             this.spotifySearch = confirmedSongData.spotifySearch;
-            this.spotifyMissmatch = confirmedSongData.spotifyMissmatch;
+            this.spotifyMismatch = confirmedSongData.spotifyMismatch;
         }
     }
 
@@ -18,19 +17,19 @@ public class ConfirmedSongData extends SongData {
         super(songID, title, artist, album, trackNo, year, discNo, timeInSeconds, imageURI);
     }
 
-    public boolean isSpotifyMissmatch() {
-        return spotifyMissmatch;
+    public boolean isSpotifyMismatch() {
+        return spotifyMismatch;
     }
 
-    public void setSpotifyMissmatch(boolean spotifyMissmatch) {
-        this.spotifyMissmatch = spotifyMissmatch;
+    public void setSpotifyMismatch(boolean spotifyMismatch) {
+        this.spotifyMismatch = spotifyMismatch;
     }
 
 
     @Override
     public JSONObject toJSON() {
         return super.toJSON()
-                .put(SongDataKey.SPOTIFY_SEARCH.getKey(), spotifySearch)
-                .put(SongDataKey.SPOTIFY_MISSMATCH.getKey(), spotifyMissmatch);
+                .put(SongDataKeys.SPOTIFY_SEARCH.getKey(), spotifySearch)
+                .put(SongDataKeys.SPOTIFY_MISMATCH.getKey(), spotifyMismatch);
     }
 }

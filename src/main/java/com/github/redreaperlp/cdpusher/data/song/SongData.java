@@ -1,22 +1,22 @@
-package com.github.redreaperlp.cdpusher.data;
+package com.github.redreaperlp.cdpusher.data.song;
 
-import com.mysql.cj.xdevapi.JsonArray;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.Serializable;
 
-public abstract class SongData implements Serializable {
+public abstract class SongData {
     public long songID;
     public String title;
     public String artist;
     public String album;
+    public int discNo;
     public int trackNo;
     public int year;
-    public int discNo;
     public long timeInSeconds;
     public String imageURI;
     public boolean spotifySearch = true;
+    public long discID;
 
     public SongData() {}
     public SongData(SongData songData) {
@@ -46,17 +46,17 @@ public abstract class SongData implements Serializable {
 
     public JSONObject toJSON() {
         return new JSONObject()
-                .put(SongDataKey.SONG_ID.getKey(), songID)
-                .put(SongDataKey.TITLE.getKey(), title)
-                .put(SongDataKey.ARTISTS.getKey(), new JSONArray()
+                .put(SongDataKeys.SONG_ID.getKey(), songID)
+                .put(SongDataKeys.TITLE.getKey(), title)
+                .put(SongDataKeys.ARTISTS.getKey(), new JSONArray()
                         .put(artist))
-                .put(SongDataKey.ALBUM.getKey(), album)
-                .put(SongDataKey.TRACK_NO.getKey(), trackNo)
-                .put(SongDataKey.YEAR.getKey(), year)
-                .put(SongDataKey.DISC_NO.getKey(), discNo)
-                .put(SongDataKey.DURATION.getKey(), timeInSeconds)
-                .put(SongDataKey.COVER_URI.getKey(), imageURI)
-                .put(SongDataKey.SPOTIFY_SEARCH.getKey(), spotifySearch);
+                .put(SongDataKeys.ALBUM.getKey(), album)
+                .put(SongDataKeys.TRACK_NO.getKey(), trackNo)
+                .put(SongDataKeys.YEAR.getKey(), year)
+                .put(SongDataKeys.DISC_NO.getKey(), discNo)
+                .put(SongDataKeys.DURATION.getKey(), timeInSeconds)
+                .put(SongDataKeys.COVER_URI.getKey(), imageURI)
+                .put(SongDataKeys.SPOTIFY_SEARCH.getKey(), spotifySearch);
     }
 
     public long getSongID() {
@@ -75,16 +75,16 @@ public abstract class SongData implements Serializable {
         return album;
     }
 
+    public int getDiscNo() {
+        return discNo;
+    }
+
     public int getTrackNo() {
         return trackNo;
     }
 
     public int getYear() {
         return year;
-    }
-
-    public int getDiscNo() {
-        return discNo;
     }
 
     public long getTimeInSeconds() {
@@ -99,6 +99,10 @@ public abstract class SongData implements Serializable {
         return spotifySearch;
     }
 
+    public long getDiscID() {
+        return discID;
+    }
+
     public void setSongID(long songID) {
         this.songID = songID;
     }
@@ -107,12 +111,16 @@ public abstract class SongData implements Serializable {
         this.title = title;
     }
 
-    public void setArtist(String artists) {
-        this.artist = artists;
+    public void setArtist(String artist) {
+        this.artist = artist;
     }
 
     public void setAlbum(String album) {
         this.album = album;
+    }
+
+    public void setDiscNo(int discNo) {
+        this.discNo = discNo;
     }
 
     public void setTrackNo(int trackNo) {
@@ -121,10 +129,6 @@ public abstract class SongData implements Serializable {
 
     public void setYear(int year) {
         this.year = year;
-    }
-
-    public void setDiscNo(int discNo) {
-        this.discNo = discNo;
     }
 
     public void setTimeInSeconds(long timeInSeconds) {
@@ -137,5 +141,9 @@ public abstract class SongData implements Serializable {
 
     public void setSpotifySearch(boolean spotifySearch) {
         this.spotifySearch = spotifySearch;
+    }
+
+    public void setDiscID(long discID) {
+        this.discID = discID;
     }
 }

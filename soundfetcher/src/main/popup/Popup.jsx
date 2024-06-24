@@ -20,10 +20,10 @@ export function Popup({song, storage, closePopup}) {
     }
     console.log(storage.songs[index]);
 
-    function resolveColor(spotifySearch, spotifyMissmatch) {
+    function resolveColor(spotifySearch, spotifyMismatch) {
         if (!spotifySearch) {
             return "red";
-        } else if (spotifyMissmatch) {
+        } else if (spotifyMismatch) {
             return "yellow";
         } else {
             return "green";
@@ -60,7 +60,7 @@ export function Popup({song, storage, closePopup}) {
     }
 
     function resolveButton() {
-        if (song.spotify_search && !song.spotify_missmatch) {
+        if (song.spotify_search && !song.spotify_mismatch) {
             return <>
                 <button className="popup__button" onClick={() => fireSwal()}>Patch</button>
                 <button className="popup__button" onClick={() => closePopup()}>Close</button>
@@ -121,7 +121,7 @@ export function Popup({song, storage, closePopup}) {
                             <div className="popup__lower">
                                 <p className="composer">Spotify State</p>
                                 <div className="popup__indicator"
-                                     style={{background: resolveColor(song.spotify_search, song.spotify_missmatch)}}></div>
+                                     style={{background: resolveColor(song.spotify_search, song.spotify_mismatch)}}></div>
                             </div>
                         </div>
                     </div>

@@ -87,7 +87,7 @@ function App() {
                         });
                         break;
                     case "push-database": {
-                        if (response.status === "no-missmatch") {
+                        if (response.status === "no-mismatch") {
                             Swal.fire({
                                 title: "Songs successfully pushed to database",
                                 icon: "success"
@@ -97,7 +97,7 @@ function App() {
                             }));
                         } else {
                             Swal.fire({
-                                title: "There are still some missmatches",
+                                title: "There are still some mismatches",
                                 text: "Please fix the songs and try again (" + response.songs.length + " songs)",
                             })
                         }

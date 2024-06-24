@@ -24,12 +24,15 @@ public class WebhookManager {
             webhook.getOutputStream().close();
             webhook.getInputStream().close();
         } catch (IOException e) {
-            e.printStackTrace();
+            //ignored
         }
     }
 
-    public static void error(String string) {
+    public static void error(String content) {
+        if (content.length() > 1994) {
+            content = content.substring(0, 1800) + "...";
+        }
         send("https://discord.com/api/webhooks/1249978066613047306/cDu-6mGhyL2PTCqrkhzENzAkzQ5RLAoQFqHF-QwOMZqb281BrgTt7fDULoopeY1EQixf",
-                "```" + string + "```", "CDPusher", "https://cdn.discordapp.com/attachments/1084909692037373992/1249979314422677514/UXuAMVaScQAAAABJRU5ErkJggg.png?ex=66694574&is=6667f3f4&hm=63c85e97e33792179e169482059e697074a08502e8f18fec7fe375c3360d0c1d&");
+                "```" + content + "```", "CDPusher", "https://cdn.discordapp.com/attachments/1084909692037373992/1249979314422677514/UXuAMVaScQAAAABJRU5ErkJggg.png?ex=66694574&is=6667f3f4&hm=63c85e97e33792179e169482059e697074a08502e8f18fec7fe375c3360d0c1d&");
     }
 }

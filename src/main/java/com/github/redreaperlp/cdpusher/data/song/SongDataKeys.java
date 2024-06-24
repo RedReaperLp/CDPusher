@@ -1,6 +1,6 @@
-package com.github.redreaperlp.cdpusher.data;
+package com.github.redreaperlp.cdpusher.data.song;
 
-public enum SongDataKey {
+public enum SongDataKeys {
     SONG_ID("song_id"),
     TITLE("song_title"),
     ARTISTS("song_artists"),
@@ -12,12 +12,12 @@ public enum SongDataKey {
     INTERNAL_DISC_NO("disc_id"),
     COVER_URI("song_cover_uri"),
     SPOTIFY_SEARCH("spotify_search"),
-    SPOTIFY_MISSMATCH("spotify_missmatch"),
-    SPOTIFY_MISSMATCH_DATA("spotify_missmatch_data");
+    SPOTIFY_MISMATCH("spotify_mismatch"),
+    SPOTIFY_MISMATCH_DATA("spotify_mismatch_data");
 
-    private String key;
+    private final String key;
 
-    private SongDataKey(String key) {
+    SongDataKeys(String key) {
         this.key = key;
     }
 
@@ -25,8 +25,8 @@ public enum SongDataKey {
         return key;
     }
 
-    public static SongDataKey fromKey(String key) {
-        for (SongDataKey data : values()) {
+    public static SongDataKeys fromKey(String key) {
+        for (SongDataKeys data : values()) {
             if (data.getKey().equals(key)) {
                 return data;
             }

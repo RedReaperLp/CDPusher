@@ -1,37 +1,25 @@
-package com.github.redreaperlp.cdpusher.hibernate;
+package com.github.redreaperlp.cdpusher.data.disc;
 
-import com.github.redreaperlp.cdpusher.data.DiscOGsSong;
+import com.github.redreaperlp.cdpusher.data.song.Song;
+import com.github.redreaperlp.cdpusher.database.DatabaseManager;
 import com.github.redreaperlp.cdpusher.http.DiscOgsSearch;
 import com.github.redreaperlp.cdpusher.user.User;
+import com.github.redreaperlp.cdpusher.util.Value;
 import com.github.redreaperlp.cdpusher.util.logger.types.ErrorPrinter;
 import com.github.redreaperlp.cdpusher.util.logger.types.InfoPrinter;
-import jakarta.persistence.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.Serializable;
+import java.sql.Statement;
 import java.util.List;
 
-@Entity
-@Table(name = "discs")
-public class DiscInformation implements Serializable {
-    @Id
-    @Column(name = "disc_id")
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class DiscInformation {
     private long id;
-
-    @Column(name = "country")
     private String country;
-    @Column(name = "year")
-    private String year;
-    @Column(name = "title")
+    private int year;
     private String title;
-    @Column(name = "label")
     private String label;
-    @Column(name = "resource_url")
     private String resourceURL;
-
-    @OneToMany(mappedBy = "discInformation", fetch = FetchType.EAGER)
     private List<Song> songs;
 
     public DiscInformation() {
@@ -39,7 +27,7 @@ public class DiscInformation implements Serializable {
 
     public DiscInformation(JSONObject requestResponse) {
         if (requestResponse.has("country")) this.country = requestResponse.getString("country");
-        if (requestResponse.has("year")) this.year = requestResponse.getString("year");
+        if (requestResponse.has("year")) this.year = Integer.parseInt(requestResponse.getString("year"));
         if (requestResponse.has("title")) this.title = requestResponse.getString("title");
         if (requestResponse.has("label"))
             this.label = requestResponse.getJSONArray("label").toList().stream().map(Object::toString).toArray(String[]::new)[0];
@@ -68,7 +56,7 @@ public class DiscInformation implements Serializable {
         return country;
     }
 
-    public String getYear() {
+    public int getYear() {
         return year;
     }
 
@@ -118,16 +106,67 @@ public class DiscInformation implements Serializable {
         return toJSON().toString();
     }
 
-    public void pushToDB() {
-        try (var session = HibernateSession.getInstance().getSessionFactory().openSession()) {
-            session.beginTransaction();
-            session.persist(this);
+    /**
+     * Pushes the DiscInformation to the Database
+     */
+    public Value<Integer, String> pushToDB() {
+        if (doesDiscExist()) {
+            new InfoPrinter().append("Disc already exists").print();
+            return new Value<>(409, "Disc already exists");
+        }
+        try (var con = DatabaseManager.getInstance().getConnection()) {
+            var ps = con.prepareStatement("INSERT INTO cdpusher.discs (Title, Label, Country, ResourceUrl, Year) VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, title);
+            ps.setString(2, label);
+            ps.setString(3, country);
+            ps.setString(4, resourceURL);
+            ps.setInt(5, year);
+            ps.executeUpdate();
 
-            getSongs().forEach(session::persist);
-
-            session.getTransaction().commit();
+            try (var rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    this.setId(rs.getLong(1));
+                }
+            }
         } catch (Exception e) {
             new ErrorPrinter().appendException(e).print();
+            return new Value<>(500, "Internal Server Error");
+        }
+        this.setId(id);
+        return new Value<>(200);
+    }
+
+    public boolean doesDiscExist() {
+        try (var con = DatabaseManager.getInstance().getConnection()) {
+            var ps = con.prepareStatement("SELECT * FROM cdpusher.discs WHERE Title = ? AND Label = ? AND Country = ? AND ResourceUrl = ? AND Year = ?");
+            ps.setString(1, title);
+            ps.setString(2, label);
+            ps.setString(3, country);
+            ps.setString(4, resourceURL);
+            ps.setInt(5, year);
+            var rs = ps.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            new ErrorPrinter().appendException(e).print();
+            return false;
+        }
+    }
+
+    public boolean pushSongsToDB() {
+        if (id == -1) {
+            new ErrorPrinter().append("DiscInformation not pushed to DB").print();
+            return false;
+        }
+        try (var con = DatabaseManager.getInstance().getConnection()) {
+            con.setAutoCommit(false);
+            for (Song song : songs) {
+                song.pushToDB(con, id);
+            }
+            con.commit();
+            return true;
+        } catch (Exception e) {
+            new ErrorPrinter().appendException(e).print();
+            return false;
         }
     }
 
@@ -139,7 +178,7 @@ public class DiscInformation implements Serializable {
         this.country = country;
     }
 
-    public void setYear(String year) {
+    public void setYear(int year) {
         this.year = year;
     }
 

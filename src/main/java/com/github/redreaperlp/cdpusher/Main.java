@@ -1,7 +1,7 @@
 package com.github.redreaperlp.cdpusher;
 
 import com.github.redreaperlp.cdpusher.api.get.GetUser;
-import com.github.redreaperlp.cdpusher.hibernate.DiscInformation;
+import com.github.redreaperlp.cdpusher.data.disc.DiscInformation;
 import com.github.redreaperlp.cdpusher.database.DatabaseConfiguration;
 import com.github.redreaperlp.cdpusher.http.DiscOgsSearch;
 import com.github.redreaperlp.cdpusher.user.SocketManager;
@@ -10,7 +10,6 @@ import com.github.redreaperlp.cdpusher.util.FileAccessor;
 import com.github.redreaperlp.cdpusher.util.enums.responses.CacheControl;
 import com.github.redreaperlp.cdpusher.util.enums.responses.ContentTypes;
 import com.github.redreaperlp.cdpusher.util.logger.Loggers;
-import com.github.redreaperlp.cdpusher.hibernate.HibernateSession;
 import io.javalin.Javalin;
 import io.javalin.plugin.bundled.CorsPluginConfig;
 import org.json.JSONObject;
@@ -38,8 +37,6 @@ public class Main {
 
     public void init() {
         Loggers.load();
-        HibernateSession.getInstance();
-        new DatabaseConfiguration("45.81.235.52", "cdpusher", "cdpusher", "cdpusher").initDatabase();
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {

@@ -1,15 +1,15 @@
-package com.github.redreaperlp.cdpusher.data;
+package com.github.redreaperlp.cdpusher.data.song;
 
-import com.github.redreaperlp.cdpusher.hibernate.Song;
+import com.github.redreaperlp.cdpusher.data.disc.DiscOGsSong;
 import org.json.JSONObject;
 
-public class SongMissmatch extends Song {
+public class SongMismatch extends Song {
     public Song spotifySong;
 
-    public SongMissmatch(DiscOGsSong discOGsSong, Song spotifyResult) {
+    public SongMismatch(DiscOGsSong discOGsSong, Song spotifyResult) {
         super(discOGsSong);
         this.spotifyResult = spotifyResult;
-        this.setSpotifyMissmatch(true);
+        this.setSpotifyMismatch(true);
     }
 
     public Song spotifyResult;
@@ -19,7 +19,7 @@ public class SongMissmatch extends Song {
         if (spotifySong == null) {
             return super.toJSON();
         }
-        return super.toJSON().put(SongDataKey.SPOTIFY_MISSMATCH_DATA.getKey(), spotifySong.toJSON());
+        return super.toJSON().put(SongDataKeys.SPOTIFY_MISMATCH_DATA.getKey(), spotifySong.toJSON());
     }
 
     public Song getSpotifyResult() {

@@ -1,8 +1,8 @@
 package com.github.redreaperlp.cdpusher.user;
 
-import com.github.redreaperlp.cdpusher.data.SongData;
-import com.github.redreaperlp.cdpusher.hibernate.DiscInformation;
-import com.github.redreaperlp.cdpusher.hibernate.Song;
+import com.github.redreaperlp.cdpusher.data.song.SongData;
+import com.github.redreaperlp.cdpusher.data.disc.DiscInformation;
+import com.github.redreaperlp.cdpusher.data.song.Song;
 import com.github.redreaperlp.cdpusher.util.logger.types.TestPrinter;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -106,14 +106,24 @@ public class User {
             return;
         }
         List<Song> songs = new ArrayList<>();
+        var res = disc.pushToDB();
+
+        if (res.isErrored()) {
+            switch (res.getValue()) {
+                case 409 -> broadcastMessage(new JSONObject().put("request", "error").put("message", "Disc already exists").toString());
+                case 500 -> broadcastMessage(new JSONObject().put("request", "error").put("message", "Internal Server Error").toString());
+            }
+            return;
+        }
+
         for (SongData song : this.songs) {
             if (song instanceof Song song1) {
                 songs.add(song1);
-                song1.setDiscInformation(disc);
+                song1.setDiscID(disc.getId());
             }
         }
         disc.setSongs(songs);
-        disc.pushToDB();
+        disc.pushSongsToDB();
     }
 
     public void setDisc(DiscInformation disc) {

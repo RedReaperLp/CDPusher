@@ -1,8 +1,9 @@
-package com.github.redreaperlp.cdpusher.data;
+package com.github.redreaperlp.cdpusher.data.disc;
 
-import com.github.redreaperlp.cdpusher.hibernate.Song;
+import com.github.redreaperlp.cdpusher.data.song.Song;
+import com.github.redreaperlp.cdpusher.data.song.SongData;
+import com.github.redreaperlp.cdpusher.data.song.SongMismatch;
 import com.github.redreaperlp.cdpusher.http.SpotifySearch;
-import com.github.redreaperlp.cdpusher.util.logger.types.ErrorPrinter;
 import com.github.redreaperlp.cdpusher.util.logger.types.TestPrinter;
 import org.json.JSONObject;
 
@@ -41,7 +42,7 @@ public class DiscOGsSong extends SongData {
         if (this.spotifySearch) {
             JSONObject res = SpotifySearch.getInstance().finalizeSearch(this);
             if (res == null) {
-                return new SongMissmatch(this, null);
+                return new SongMismatch(this, null);
             }
             var track = res.getJSONArray("items").getJSONObject(0);
             JSONObject album = track.getJSONObject("album");
@@ -68,8 +69,8 @@ public class DiscOGsSong extends SongData {
             if (titlesMatch(this.title, normalizedTitle)) {
                 return song;
             } else {
-                var missmatch = new SongMissmatch(this, song);
-                return missmatch;
+                var mismatch = new SongMismatch(this, song);
+                return mismatch;
             }
         }
         return new Song(this);

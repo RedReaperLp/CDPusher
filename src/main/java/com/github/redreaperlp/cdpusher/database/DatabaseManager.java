@@ -1,5 +1,7 @@
 package com.github.redreaperlp.cdpusher.database;
 
+import com.github.redreaperlp.cdpusher.database.statements.CreateTables;
+import com.github.redreaperlp.cdpusher.util.logger.types.ErrorPrinter;
 import com.github.redreaperlp.cdpusher.util.logger.types.InfoPrinter;
 import com.github.redreaperlp.cdpusher.util.logger.types.MessagePart;
 import com.github.redreaperlp.cdpusher.util.logger.types.SuccessPrinter;
@@ -16,6 +18,9 @@ public class DatabaseManager {
     private static DatabaseManager instance;
 
     public static DatabaseManager getInstance() {
+        if (instance == null) {
+            new DatabaseConfiguration("45.81.235.52", "cdpusher", "cdpusher", "cdpusher").initDatabase();
+        }
         return instance;
     }
 
@@ -30,6 +35,8 @@ public class DatabaseManager {
         hikariConfig.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dataSource = new HikariDataSource(hikariConfig);
         new SuccessPrinter(new MessagePart("[Database Manager]")).append("Database Manager initialized").print();
+
+        CreateTables.CreateIfNotExists();
     }
 
     public long getHighestSongID() {
@@ -50,7 +57,7 @@ public class DatabaseManager {
         try {
             return dataSource.getConnection();
         } catch (Exception e) {
-            e.printStackTrace();
+            new ErrorPrinter().appendException(e).print();
         }
         return null;
     }
@@ -68,7 +75,7 @@ public class DatabaseManager {
             }
             return 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            new ErrorPrinter().appendException(e).print();
         }
         return 0;
     }

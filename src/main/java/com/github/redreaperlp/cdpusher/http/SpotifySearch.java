@@ -1,7 +1,7 @@
 package com.github.redreaperlp.cdpusher.http;
 
-import com.github.redreaperlp.cdpusher.data.DiscOGsSong;
-import com.github.redreaperlp.cdpusher.hibernate.Song;
+import com.github.redreaperlp.cdpusher.data.disc.DiscOGsSong;
+import com.github.redreaperlp.cdpusher.data.song.Song;
 import com.github.redreaperlp.cdpusher.spotify.SpotifyAuthentication;
 import org.json.JSONArray;
 import org.json.JSONObject;

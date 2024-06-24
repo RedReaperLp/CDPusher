@@ -10712,10 +10712,10 @@ function Popup({ song, storage, closePopup }) {
     return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {});
   }
   console.log(storage.songs[index]);
-  function resolveColor(spotifySearch, spotifyMissmatch) {
+  function resolveColor(spotifySearch, spotifyMismatch) {
     if (!spotifySearch) {
       return "red";
-    } else if (spotifyMissmatch) {
+    } else if (spotifyMismatch) {
       return "yellow";
     } else {
       return "green";
@@ -10748,7 +10748,7 @@ function Popup({ song, storage, closePopup }) {
     });
   }
   function resolveButton() {
-    if (song.spotify_search && !song.spotify_missmatch) {
+    if (song.spotify_search && !song.spotify_mismatch) {
       return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "popup__button", onClick: () => fireSwal(), children: "Patch" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "popup__button", onClick: () => closePopup(), children: "Close" })
@@ -10801,7 +10801,7 @@ function Popup({ song, storage, closePopup }) {
             "div",
             {
               className: "popup__indicator",
-              style: { background: resolveColor(song.spotify_search, song.spotify_missmatch) }
+              style: { background: resolveColor(song.spotify_search, song.spotify_mismatch) }
             }
           )
         ] }) })
@@ -10858,8 +10858,8 @@ function Content({ storage }) {
     testEans(),
     storage.songs && storage.songs.map((song) => {
       let className = "song";
-      if (song.spotify_missmatch || !song.spotify_search) {
-        className += " song__missmatch";
+      if (song.spotify_mismatch || !song.spotify_search) {
+        className += " song__mismatch";
       }
       if (song.cover_uri === null) {
         song.cover_uri = "/assets/images/svg/questionmark.svg";
@@ -10995,7 +10995,7 @@ function App() {
             });
             break;
           case "push-database": {
-            if (response.status === "no-missmatch") {
+            if (response.status === "no-mismatch") {
               Swal.fire({
                 title: "Songs successfully pushed to database",
                 icon: "success"
@@ -11005,7 +11005,7 @@ function App() {
               }));
             } else {
               Swal.fire({
-                title: "There are still some missmatches",
+                title: "There are still some mismatches",
                 text: "Please fix the songs and try again (" + response.songs.length + " songs)"
               });
             }

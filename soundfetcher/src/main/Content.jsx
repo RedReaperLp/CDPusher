@@ -50,8 +50,8 @@ function Content({storage}) {
             {testEans()}
             {storage.songs && storage.songs.map((song) => {
                 let className = "song";
-                if (song.spotify_missmatch || !song.spotify_search) {
-                    className += " song__missmatch";
+                if (song.spotify_mismatch || !song.spotify_search) {
+                    className += " song__mismatch";
                 }
                 if (song.cover_uri === null) {
                     song.cover_uri = "/assets/images/svg/questionmark.svg";
