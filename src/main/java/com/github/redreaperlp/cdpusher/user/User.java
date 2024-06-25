@@ -1,12 +1,10 @@
 package com.github.redreaperlp.cdpusher.user;
 
-import com.github.redreaperlp.cdpusher.data.song.SongData;
 import com.github.redreaperlp.cdpusher.data.disc.DiscInformation;
 import com.github.redreaperlp.cdpusher.data.song.Song;
+import com.github.redreaperlp.cdpusher.data.song.SongData;
 import com.github.redreaperlp.cdpusher.http.Topic;
-import com.github.redreaperlp.cdpusher.util.logger.types.TestPrinter;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -27,19 +25,23 @@ public class User {
 
     public void clearSongs() {
         songs.clear();
-        broadcastMessage(new JSONObject().put("request", "clear-songs").toString());
+        broadcastMessage(Topic.Disc.CLEAR.fillResponse(Topic.Request.UPDATE).toString());
     }
 
     public void addSong(SongData song) {
         songs.add(song);
-        broadcastMessage(new JSONObject().put("request", "song-response").put("song", song.toJSON()).toString());
+        broadcastMessage(Topic.Songs.UPDATE.fillResponse(Topic.Request.UPDATE)
+                .put("song", song.toJSON())
+                .toString());
     }
 
     public void setSong(Song song) {
         for (int i = 0; i < songs.size(); i++) {
             if (songs.get(i).getSongID() == song.getSongID()) {
                 songs.set(i, song);
-                broadcastMessage(new JSONObject().put("request", "song-update").put("song", song.toJSON()).toString());
+                broadcastMessage(Topic.Songs.UPDATE.fillResponse(Topic.Request.UPDATE)
+                        .put("song", song.toJSON())
+                        .toString());
                 return;
             }
         }
@@ -63,7 +65,6 @@ public class User {
 
     public boolean shouldDump() {
         if (LocalDateTime.now().isAfter(dumpUser)) {
-            new TestPrinter().append("User " + username + " dumped").print();
             return true;
         }
         return false;
@@ -103,7 +104,7 @@ public class User {
 
     public void finish() {
         if (disc == null) {
-            broadcastMessage(new JSONObject().put("request", "error").put("message", "No disc information").toString());
+            broadcastMessage(Topic.Disc.NOT_FOUND.fillResponse(Topic.Request.ERROR).toString());
             return;
         }
         List<Song> songs = new ArrayList<>();
@@ -111,11 +112,11 @@ public class User {
         if (res.isErrored()) {
             switch (res.getStatus()) {
                 case 409 -> broadcastMessage(Topic.Disc.ALREADY_EXISTS
-                        .fillResponse(new JSONObject().put("request", "error"))
+                        .fillResponse(Topic.Request.ERROR)
                         .put("conflict", res.getValue())
                         .toString());
                 case 500 -> broadcastMessage(Topic.Disc.FAILED
-                        .fillResponse(new JSONObject().put("request", "error"))
+                        .fillResponse(Topic.Request.ERROR)
                         .put("error", res.getError())
                         .toString());
             }
@@ -133,7 +134,7 @@ public class User {
 
         clearSongs();
         broadcastMessage(Topic.Disc.PUSHED_TO_DB
-                .fillResponse(new JSONObject().put("request", "success"))
+                .fillResponse(Topic.Request.SUCCESS)
                 .put("disc_id", res.getValue())
                 .toString());
     }

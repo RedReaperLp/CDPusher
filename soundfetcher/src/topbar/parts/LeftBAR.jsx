@@ -15,7 +15,7 @@ function LeftBAR({storage}) {
                 height: "40px",
                 width: "40px",
             }}>
-                <img height={"40px"} width={"40px"} src={"https://www.svgrepo.com/show/880/compact-disc.svg"}
+                <img id={"disc-logo"} height={"40px"} width={"40px"} src={"https://www.svgrepo.com/show/880/compact-disc.svg"}
                      alt="logo"/>
             </div>
             <div className="left-bar__search">

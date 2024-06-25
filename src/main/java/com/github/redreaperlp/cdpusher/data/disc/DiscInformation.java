@@ -7,7 +7,6 @@ import com.github.redreaperlp.cdpusher.user.User;
 import com.github.redreaperlp.cdpusher.util.Value;
 import com.github.redreaperlp.cdpusher.util.logger.types.ErrorPrinter;
 import com.github.redreaperlp.cdpusher.util.logger.types.InfoPrinter;
-import com.github.redreaperlp.cdpusher.util.logger.types.TestPrinter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

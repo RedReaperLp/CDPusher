@@ -4,6 +4,7 @@ import Content from "./main/Content.jsx";
 import Footer from "./footer/Footer.jsx";
 import {fetchSongs} from "./Fetching.jsx";
 import Swal from "sweetalert2";
+import {findTopic, Topic} from "./Topic.js";
 
 let wsString;
 if (window.location.hostname === "localhost") {
@@ -12,10 +13,9 @@ if (window.location.hostname === "localhost") {
     wsString = "wss://";
 }
 
-function discTopic(response) {
-    console.log("Disc response: ", response)
+function discTopic(response, storageRef) {
     switch (response.type) {
-        case "already_exists": {
+        case Topic.DISC.ALREADY_EXISTS: {
             Swal.fire({
                 title: "Disc already exists",
                 html: "<a>The disc you are trying to add already exists in the database</a><br>" +
@@ -25,7 +25,7 @@ function discTopic(response) {
             break;
         }
 
-        case "failed": {
+        case Topic.DISC.FAILED: {
             Swal.fire({
                 title: "Failed to add disc",
                 html: "<a>There was an error adding the disc to the database</a><br>" +
@@ -35,7 +35,7 @@ function discTopic(response) {
             break;
         }
 
-        case "pushed_to_db": {
+        case Topic.DISC.PUSHED_TO_DB: {
             Swal.fire({
                 title: "Disc added successfully",
                 html: "<a>The disc has been added to the database</a><br>" +
@@ -45,7 +45,7 @@ function discTopic(response) {
             break;
         }
 
-        case "still_mismatches": {
+        case Topic.DISC.STILL_MISMATCHES: {
             Swal.fire({
                 title: "There are still mismatches",
                 text: "Please fix the songs and try again (" + response.songs.length + " songs)",
@@ -54,11 +54,79 @@ function discTopic(response) {
             break;
         }
 
-        case "still_indexing": {
+        case Topic.DISC.STILL_INDEXING: {
             Swal.fire({
                 title: "Still indexing",
                 text: "Please wait for the disc to finish indexing",
                 icon: "info"
+            });
+            break;
+        }
+
+        case Topic.DISC.NOT_FOUND: {
+            Swal.fire({
+                title: "Disc not found",
+                html: "<a>The disc you are trying to add was not found</a><br>" +
+                    "Are you sure you entered the correct ean?",
+                icon: "error"
+            });
+            break;
+        }
+
+        case Topic.DISC.CLEAR: {
+            storageRef.current.setSongs([]);
+            storageRef.current.setDiscInfo({});
+
+            Swal.fire({
+                title: "Songs cleared",
+                icon: "success",
+                timer: 1000
+            });
+            break
+        }
+
+        case Topic.DISC.SUBMIT_DISC_INFO : {
+            storageRef.current.setDiscInfo(response.info);
+        }
+    }
+}
+
+function searchTopic(response, storageRef) {
+    switch (response.type) {
+        case Topic.SEARCH.START: {
+            document.getElementById("disc-logo").classList.add("loading");
+            break;
+        }
+
+        case Topic.SEARCH.FINISHED: {
+            document.getElementById("disc-logo").classList.remove("loading");
+            break;
+        }
+    }
+}
+
+function songTopic(response, storageRef) {
+    switch (response.type) {
+        case Topic.SONGS.UPDATE: {
+            const id = storageRef.current.songs.findIndex(song => song.song_id === response.song.song_id);
+            if (response.song.song_cover_uri === null || !response.song.song_cover_uri) {
+                response.song.song_cover_uri = "/assets/images/svg/questionmark.svg";
+            }
+            if (id !== -1) {
+                storageRef.current.setSongs(prevSongs => {
+                    const updatedSongs = [...prevSongs];
+                    updatedSongs[id] = response.song;
+                    return updatedSongs;
+                });
+            } else {
+                storageRef.current.setSongs(prevSongs => [...prevSongs, response.song]);
+            }
+            const el = document.querySelector(".content");
+
+            if (el && el.childElementCount % 5 === 0) el.lastChild.scrollIntoView({
+                behavior: "smooth",
+                block: "end",
+                inline: "nearest"
             });
             break;
         }
@@ -67,7 +135,7 @@ function discTopic(response) {
 
 function clearSongs(storage) {
     storage.webSocket.send(JSON.stringify({
-        request: "clear-songs"
+        request: Topic.DISC.CLEAR
     }));
 }
 
@@ -91,7 +159,8 @@ function App() {
         function initializeWebSocket() {
             storage.webSocket.onopen = () => {
                 storage.webSocket.send(JSON.stringify({
-                    request: "login",
+                    request: Topic.USER.LOGIN,
+                    topic: Topic.DESCRIPTORS.USER,
                     username: username
                 }));
                 ping();
@@ -99,76 +168,25 @@ function App() {
 
             storage.webSocket.onmessage = (event) => {
                 const response = JSON.parse(event.data);
-                const curSongs = storageRef.current.songs;
-                switch (response.request) {
-                    case "disc-info": {
-                        storageRef.current.setDiscInfo(response.info);
-                        break;
-                    }
-                    case "song-response": {
-                        const id = curSongs.findIndex(song => song.song_id === response.song.song_id);
-                        if (response.song.song_cover_uri === null || !response.song.song_cover_uri) {
-                            response.song.song_cover_uri = "/assets/images/svg/questionmark.svg";
-                        }
-                        if (id !== -1) {
-                            storageRef.current.setSongs(prevSongs => {
-                                const updatedSongs = [...prevSongs];
-                                updatedSongs[id] = response.song;
-                                return updatedSongs;
-                            });
-                        } else {
-                            storageRef.current.setSongs(prevSongs => [...prevSongs, response.song]);
-                        }
-                        const el = document.querySelector(".content");
 
-                        if (el && el.childElementCount % 5 === 0) el.lastChild.scrollIntoView({
-                            behavior: "smooth",
-                            block: "end",
-                            inline: "nearest"
-                        });
+                switch (findTopic(response.topic).toLowerCase()) {
+                    case Topic.DESCRIPTORS.DISC: {
+                        discTopic(response, storageRef);
                         break;
                     }
-                    case "clear-songs":
-                        storageRef.current.setSongs([]);
-                        storageRef.current.setDiscInfo({});
-                        break;
-                    case "song-update":
-                        storageRef.current.setSongs(prevSongs => {
-                            return prevSongs.map(song => {
-                                if (song.song_id === response.song.song_id) {
-                                    if (response.song.song_cover_uri === null || !response.song.song_cover_uri) {
-                                        response.song.song_cover_uri = "/assets/images/svg/questionmark.svg";
-                                    }
-                                    console.log("Updated song: ", response.song);
-                                    return response.song;
-                                }
-                                return song;
-                            });
-                        });
-                        break;
-                    case "push-database": {
-                        if (response.status === "no-mismatch") {
-                            Swal.fire({
-                                title: "Songs successfully pushed to database",
-                                icon: "success"
-                            });
-                            clearSongs(storage);
-                        } else {
-                            Swal.fire({
-                                title: "There are still some mismatches",
-                                text: "Please fix the songs and try again (" + response.songs.length + " songs)",
-                            })
-                        }
-                        break;
-                    }
-                    default:
-                        break;
-                }
 
-                switch (response.topic) {
-                    case "disc": {
-                        discTopic(response);
-                        break;
+                    case Topic.DESCRIPTORS.SEARCH: {
+                        searchTopic(response, storageRef);
+                        break
+                    }
+
+                    case Topic.DESCRIPTORS.SONGS: {
+                        songTopic(response, storageRef);
+                        break
+                    }
+
+                    case null: {
+                        console.error("Invalid request: ", response);
                     }
                 }
             };
@@ -210,7 +228,10 @@ function App() {
     function ping() {
         setInterval(() => {
             if (storageRef.current.webSocket.readyState === WebSocket.OPEN) {
-                storageRef.current.webSocket.send(JSON.stringify({request: "ping"}));
+                storageRef.current.webSocket.send(JSON.stringify({
+                    request: Topic.USER.PING,
+                    topic: Topic.DESCRIPTORS.USER
+                }));
             }
         }, 5000);
     }

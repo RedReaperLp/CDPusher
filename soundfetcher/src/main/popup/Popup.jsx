@@ -1,11 +1,12 @@
 import Swal from "sweetalert2";
 import "./Popup.scss";
+import {Topic} from "../../Topic.js";
 
 function useDiscOGs(song, storage, closePopup) {
-    console.log(song);
     storage.webSocket.send(JSON.stringify({
         song_disc_no: song.song_disc_no,
-        request: "use-discogs",
+        request: Topic.SONGS.USE_DISCOGS,
+        topic: Topic.DESCRIPTORS.SONGS,
         song_track_no: song.song_track_no,
     }))
     closePopup();
@@ -18,7 +19,6 @@ export function Popup({song, storage, closePopup}) {
     if (index === -1) {
         return (<></>);
     }
-    console.log(storage.songs[index]);
 
     function resolveColor(spotifySearch, spotifyMismatch) {
         if (!spotifySearch) {
@@ -49,7 +49,8 @@ export function Popup({song, storage, closePopup}) {
             }
             storage.webSocket.send(
                 JSON.stringify({
-                    request: "update",
+                    request: Topic.SONGS.UPDATE,
+                    topic: Topic.DESCRIPTORS.SONGS,
                     uri: value.value,
                     song_id: song.song_id,
                 })

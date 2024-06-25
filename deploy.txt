@@ -3,7 +3,7 @@ echo
 cd /root/Reaper/projects/CDPusher
 echo -n "Starting gradle build! > "
 echo
-gradle build
+gradle shadowJar
 echo
 echo -n "Done > "
 

@@ -13,7 +13,6 @@ public class DiscOGsSong extends SongData {
     public DiscOGsSong(JSONObject data, long songID) {
         this.songID = songID;
         long timeInSeconds = 0;
-        new TestPrinter().append(data.toString(2)).print();
         try {
             String[] duration = data.getString("duration").split(":");
             timeInSeconds = (Integer.parseInt(duration[0]) * 60L + Integer.parseInt(duration[1]));

@@ -1,17 +1,20 @@
+import {Topic} from "../Topic.js";
+
 function Footer({storage}) {
     return (
         <div className={"footer"}>
             <a>© 2024 RedReaperLp</a>
             <button onClick={() => {
                 storage.webSocket.send(JSON.stringify({
-                    request: "clear-songs"
+                    request: Topic.DISC.CLEAR,
+                    topic: Topic.DESCRIPTORS.DISC
                 }));
-                storage.setSongs([]);
             }}>Clear Songs
             </button>
             <button onClick={() => {
                 storage.webSocket.send(JSON.stringify({
-                    request: "push"
+                    request: Topic.DISC.PUSH_TO_DB,
+                    topic: Topic.DESCRIPTORS.DISC
                 }));
             }}>Push Songs
             </button>

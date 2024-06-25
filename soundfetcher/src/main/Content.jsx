@@ -1,6 +1,7 @@
 import "./Content.scss";
 import {Popup} from "./popup/Popup.jsx";
 import {useEffect, useState} from "react";
+import {Topic} from "../Topic.js";
 
 function Content({storage}) {
     function testEans() {
@@ -9,7 +10,8 @@ function Content({storage}) {
             return (
                 <div key={ean} onClick={() => {
                     storage.webSocket.send(JSON.stringify(({
-                        request: "search",
+                        request: Topic.SEARCH.START,
+                        topic: Topic.DESCRIPTORS.SEARCH,
                         ean: ean
                     })))
                 }}>
@@ -23,7 +25,6 @@ function Content({storage}) {
     const [popup, setPopup] = useState({});
 
     function openPopup(song) {
-        console.log(song)
         if (song === popup) {
             closePopup();
             return;
