@@ -1,8 +1,11 @@
+import {Topic} from "../../Topic.js";
+
 function LeftBAR({storage}) {
     function evalueate(props) {
         if (event.key === "Enter") {
             storage.webSocket.send(JSON.stringify({
-                request: "search",
+                request: Topic.SEARCH.START,
+                topic: Topic.DESCRIPTORS.SEARCH,
                 ean: props.target.value
             }));
         }

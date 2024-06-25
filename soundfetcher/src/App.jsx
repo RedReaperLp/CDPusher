@@ -70,6 +70,7 @@ function discTopic(response, storageRef) {
                     "Are you sure you entered the correct ean?",
                 icon: "error"
             });
+            document.getElementById("disc-logo").classList.remove("loading");
             break;
         }
 
