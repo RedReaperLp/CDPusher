@@ -3,6 +3,7 @@ package com.github.redreaperlp.cdpusher.user;
 import com.github.redreaperlp.cdpusher.data.song.SongData;
 import com.github.redreaperlp.cdpusher.data.disc.DiscInformation;
 import com.github.redreaperlp.cdpusher.data.song.Song;
+import com.github.redreaperlp.cdpusher.http.Topic;
 import com.github.redreaperlp.cdpusher.util.logger.types.TestPrinter;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -107,11 +108,16 @@ public class User {
         }
         List<Song> songs = new ArrayList<>();
         var res = disc.pushToDB();
-
         if (res.isErrored()) {
-            switch (res.getValue()) {
-                case 409 -> broadcastMessage(new JSONObject().put("request", "error").put("message", "Disc already exists").toString());
-                case 500 -> broadcastMessage(new JSONObject().put("request", "error").put("message", "Internal Server Error").toString());
+            switch (res.getStatus()) {
+                case 409 -> broadcastMessage(Topic.Disc.ALREADY_EXISTS
+                        .fillResponse(new JSONObject().put("request", "error"))
+                        .put("conflict", res.getValue())
+                        .toString());
+                case 500 -> broadcastMessage(Topic.Disc.FAILED
+                        .fillResponse(new JSONObject().put("request", "error"))
+                        .put("error", res.getError())
+                        .toString());
             }
             return;
         }
@@ -124,6 +130,12 @@ public class User {
         }
         disc.setSongs(songs);
         disc.pushSongsToDB();
+
+        clearSongs();
+        broadcastMessage(Topic.Disc.PUSHED_TO_DB
+                .fillResponse(new JSONObject().put("request", "success"))
+                .put("disc_id", res.getValue())
+                .toString());
     }
 
     public void setDisc(DiscInformation disc) {

@@ -109,10 +109,14 @@ public class DiscInformation {
     /**
      * Pushes the DiscInformation to the Database
      */
-    public Value<Integer, String> pushToDB() {
-        if (doesDiscExist()) {
+    public Value<Long, String> pushToDB() {
+        long l = doesDiscExist();
+        if (l != -200) {
+            if (l == -500) {
+                return new Value<>(500, -1L, "Database error");
+            }
             new InfoPrinter().append("Disc already exists").print();
-            return new Value<>(409, "Disc already exists");
+            return new Value<>(409, l);
         }
         try (var con = DatabaseManager.getInstance().getConnection()) {
             var ps = con.prepareStatement("INSERT INTO cdpusher.discs (Title, Label, Country, ResourceUrl, Year) VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
@@ -130,26 +134,30 @@ public class DiscInformation {
             }
         } catch (Exception e) {
             new ErrorPrinter().appendException(e).print();
-            return new Value<>(500, "Internal Server Error");
+            return new Value<>(500, -1L);
         }
         this.setId(id);
-        return new Value<>(200);
+        return new Value<>(200, id);
     }
 
-    public boolean doesDiscExist() {
+    public long doesDiscExist() {
         try (var con = DatabaseManager.getInstance().getConnection()) {
-            var ps = con.prepareStatement("SELECT * FROM cdpusher.discs WHERE Title = ? AND Label = ? AND Country = ? AND ResourceUrl = ? AND Year = ?");
+            var ps = con.prepareStatement("SELECT DiscId FROM cdpusher.discs WHERE Title = ? AND Label = ? AND Country = ? AND ResourceUrl = ? AND Year = ?");
             ps.setString(1, title);
             ps.setString(2, label);
             ps.setString(3, country);
             ps.setString(4, resourceURL);
             ps.setInt(5, year);
             var rs = ps.executeQuery();
-            return rs.next();
+
+            if (rs.next()) {
+                return rs.getLong("DiscId");
+            }
         } catch (Exception e) {
             new ErrorPrinter().appendException(e).print();
-            return false;
+            return -500;
         }
+        return -200;
     }
 
     public boolean pushSongsToDB() {

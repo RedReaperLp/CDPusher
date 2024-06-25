@@ -7,6 +7,7 @@ import com.github.redreaperlp.cdpusher.data.song.SongDataKeys;
 import com.github.redreaperlp.cdpusher.data.song.SongMismatch;
 import com.github.redreaperlp.cdpusher.http.DiscOgsSearch;
 import com.github.redreaperlp.cdpusher.http.SpotifySearch;
+import com.github.redreaperlp.cdpusher.http.Topic;
 import io.javalin.websocket.WsContext;
 import io.javalin.websocket.WsMessageContext;
 import org.eclipse.jetty.websocket.api.WebSocketListener;
@@ -90,18 +91,21 @@ public class WebsocketSession implements WebSocketListener {
                 }
                 case PUSH_DATABASE -> {
                     if (checkUser()) return;
+                    if (user.isSearching()) {
+                        send(Topic.Disc.STILL_INDEXING
+                                .fillResponse(new JSONObject().put("request", "error"))
+                                .toString());
+                        return;
+                    }
                     List<SongData> songs = user.allSongs().stream()
                             .filter(s -> s instanceof SongMismatch)
                             .toList();
                     if (songs.isEmpty()) {
                         user.finish();
-                        user.clearSongs();
-                        send(new JSONObject().put("request", "push-database")
-                                .put("status", "no-mismatch").toString());
                     } else {
-                        send(new JSONObject().put("request", "push-database")
-                                .put("status", "mismatches")
-                                .put("songs", songs.stream().map(SongData::toJSON).toList()).toString());
+                        send(Topic.Disc.STILL_MISMATCHES
+                                .fillResponse(new JSONObject().put("request", "error"))
+                                        .put("songs", songs.stream().map(SongData::toJSON).toList()).toString());
                     }
                 }
                 case LOGIN -> {

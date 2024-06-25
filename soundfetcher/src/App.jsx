@@ -12,6 +12,65 @@ if (window.location.hostname === "localhost") {
     wsString = "wss://";
 }
 
+function discTopic(response) {
+    console.log("Disc response: ", response)
+    switch (response.type) {
+        case "already_exists": {
+            Swal.fire({
+                title: "Disc already exists",
+                html: "<a>The disc you are trying to add already exists in the database</a><br>" +
+                    "Disc ID: " + response.conflict,
+                icon: "error"
+            });
+            break;
+        }
+
+        case "failed": {
+            Swal.fire({
+                title: "Failed to add disc",
+                html: "<a>There was an error adding the disc to the database</a><br>" +
+                    "Error: " + response.error,
+                icon: "error"
+            })
+            break;
+        }
+
+        case "pushed_to_db": {
+            Swal.fire({
+                title: "Disc added successfully",
+                html: "<a>The disc has been added to the database</a><br>" +
+                    "Disc ID: " + response.disc_id,
+                icon: "success"
+            });
+            break;
+        }
+
+        case "still_mismatches": {
+            Swal.fire({
+                title: "There are still mismatches",
+                text: "Please fix the songs and try again (" + response.songs.length + " songs)",
+                icon: "error"
+            });
+            break;
+        }
+
+        case "still_indexing": {
+            Swal.fire({
+                title: "Still indexing",
+                text: "Please wait for the disc to finish indexing",
+                icon: "info"
+            });
+            break;
+        }
+    }
+}
+
+function clearSongs(storage) {
+    storage.webSocket.send(JSON.stringify({
+        request: "clear-songs"
+    }));
+}
+
 function App() {
     const [songs, setSongs] = useState([]);
     const [render, setRender] = useState(false);
@@ -71,6 +130,7 @@ function App() {
                     }
                     case "clear-songs":
                         storageRef.current.setSongs([]);
+                        storageRef.current.setDiscInfo({});
                         break;
                     case "song-update":
                         storageRef.current.setSongs(prevSongs => {
@@ -92,9 +152,7 @@ function App() {
                                 title: "Songs successfully pushed to database",
                                 icon: "success"
                             });
-                            storage.webSocket.send(JSON.stringify({
-                                request: "clear-songs"
-                            }));
+                            clearSongs(storage);
                         } else {
                             Swal.fire({
                                 title: "There are still some mismatches",
@@ -106,7 +164,15 @@ function App() {
                     default:
                         break;
                 }
+
+                switch (response.topic) {
+                    case "disc": {
+                        discTopic(response);
+                        break;
+                    }
+                }
             };
+
 
             storage.webSocket.onclose = async () => {
                 console.log("WebSocket closed. Attempting to reconnect...");
