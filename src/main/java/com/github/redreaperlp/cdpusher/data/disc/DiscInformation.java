@@ -7,6 +7,7 @@ import com.github.redreaperlp.cdpusher.user.User;
 import com.github.redreaperlp.cdpusher.util.Value;
 import com.github.redreaperlp.cdpusher.util.logger.types.ErrorPrinter;
 import com.github.redreaperlp.cdpusher.util.logger.types.InfoPrinter;
+import com.github.redreaperlp.cdpusher.util.logger.types.TestPrinter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -116,7 +117,7 @@ public class DiscInformation {
                 return new Value<>(500, -1L, "Database error");
             }
             new InfoPrinter().append("Disc already exists").print();
-            return new Value<>(409, l);
+            return new Value<>(409, l, "Disc already exists");
         }
         try (var con = DatabaseManager.getInstance().getConnection()) {
             var ps = con.prepareStatement("INSERT INTO cdpusher.discs (Title, Label, Country, ResourceUrl, Year) VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
@@ -136,8 +137,7 @@ public class DiscInformation {
             new ErrorPrinter().appendException(e).print();
             return new Value<>(500, -1L);
         }
-        this.setId(id);
-        return new Value<>(200, id);
+        return new Value<>(200, getId());
     }
 
     public long doesDiscExist() {
@@ -149,7 +149,6 @@ public class DiscInformation {
             ps.setString(4, resourceURL);
             ps.setInt(5, year);
             var rs = ps.executeQuery();
-
             if (rs.next()) {
                 return rs.getLong("DiscId");
             }
