@@ -11,9 +11,17 @@
     grid-template-columns: 40% 30% 30%;
     grid-template-rows: 100%;
     grid-template-areas: "title__cover song__artist song__album";
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--song-background-color);
     margin: 10px;
     border-radius: 10px;
+
+    a {
+      color: var(--white-text-color);
+    }
+
+    div a {
+      color: var(--white-text-color);
+    }
 
     transition: all 0.3s ease-in-out;
     animation: swal2-show 0.5s ease-in-out;

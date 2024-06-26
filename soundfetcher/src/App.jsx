@@ -5,9 +5,10 @@ import Footer from "./footer/Footer.jsx";
 import {fetchSongs} from "./Fetching.jsx";
 import Swal from "sweetalert2";
 import {findTopic, Topic} from "./Topic.js";
+import Html5QrcodePlugin from "./QRCodeScanner.jsx";
 
 let wsString;
-if (window.location.hostname === "localhost") {
+if (window.location.hostname === "localhost" || window.location.hostname === "45.81.235.52") {
     wsString = "ws://";
 } else {
     wsString = "wss://";
@@ -242,6 +243,15 @@ function App() {
             <Topbar storage={storageRef.current}/>
             <Content storage={storageRef.current}/>
             <Footer storage={storageRef.current}/>
+            <Html5QrcodePlugin qrCodeSuccessCallback={(qrCodeMessage) => {
+                console.log(qrCodeMessage);
+                alert(qrCodeMessage);
+                // storageRef.current.webSocket.send(JSON.stringify({
+                //     request: Topic.DISC.ADD,
+                //     topic: Topic.DESCRIPTORS.DISC,
+                //     ean: qrCodeMessage
+                // }));
+            }}/>
         </div>
     );
 }

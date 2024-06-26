@@ -14,7 +14,7 @@
     display: grid;
     grid-template-columns: 1fr 3fr 1fr;
     grid-template-areas: "left-bar center-bar right-bar";
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--secondary-background-color);
 
     .left-bar {
       grid-area: left-bar;
@@ -32,6 +32,16 @@
 
     .right-bar {
       grid-area: right-bar;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+
+      button {
+        text-wrap: nowrap;
+        height: 40%;
+        margin: 0 10px 0 0;
+      }
     }
 
     .center-bar {
@@ -55,8 +65,13 @@
     flex-wrap: wrap;
     justify-content: center;
     align-content: center;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--secondary-background-color);
     align-items: center;
+
+    a {
+      color: var(--white-text);
+      text-decoration: none;
+    }
   }
 }
 

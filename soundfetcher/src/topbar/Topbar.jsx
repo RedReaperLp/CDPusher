@@ -9,7 +9,7 @@ function Topbar(storage) {
             <div className="topbar">
                 <LeftBAR storage={storage.storage}/>
                 <CenterBAR/>
-                <RightBAR/>
+                <RightBAR storage={storage.storage}/>
             </div>
         </>
     )
