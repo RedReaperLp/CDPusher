@@ -191,6 +191,7 @@ public class Topic {
                 DiscInformation disc = DiscOgsSearch.getInstance().searchEan(ean);
                 if (disc == null) {
                     user.broadcastMessage(Disc.NOT_FOUND.fillResponse(Request.ERROR)
+                            .put("ean", ean)
                             .toString());
                     user.setSearching(false);
                     return;

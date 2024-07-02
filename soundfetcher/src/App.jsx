@@ -68,7 +68,7 @@ function discTopic(response, storageRef) {
             Swal.fire({
                 title: "Disc not found",
                 html: "<a>The disc you are trying to add was not found</a><br>" +
-                    "Are you sure you entered the correct ean?",
+                    "Are you sure you entered the correct ean? (" + response.ean + ")",
                 icon: "error"
             });
             document.getElementById("disc-logo").classList.remove("loading");
@@ -93,7 +93,7 @@ function discTopic(response, storageRef) {
     }
 }
 
-function searchTopic(response, storageRef) {
+function searchTopic(response) {
     switch (response.type) {
         case Topic.SEARCH.START: {
             document.getElementById("disc-logo").classList.add("loading");
@@ -135,24 +135,21 @@ function songTopic(response, storageRef) {
     }
 }
 
-function clearSongs(storage) {
-    storage.webSocket.send(JSON.stringify({
-        request: Topic.DISC.CLEAR
-    }));
-}
-
 function App() {
     const [songs, setSongs] = useState([]);
     const [render, setRender] = useState(false);
     const [discInfo, setDiscInfo] = useState({});
     const ws = useMemo(() => new WebSocket(wsString + window.location.hostname + "/api/ws/"), []); // Initialize WebSocket
     const username = "RerLp";
+    let [cam, setCam] = useState();
     const storageRef = useRef({
         songs: songs,
         setSongs: setSongs,
         webSocket: ws,
         discInfo: discInfo,
-        setDiscInfo: setDiscInfo
+        setDiscInfo: setDiscInfo,
+        cam: cam,
+        setCam: setCam
     });
 
     useEffect(() => {
@@ -178,7 +175,7 @@ function App() {
                     }
 
                     case Topic.DESCRIPTORS.SEARCH: {
-                        searchTopic(response, storageRef);
+                        searchTopic(response);
                         break
                     }
 
@@ -215,10 +212,31 @@ function App() {
             songs: songs,
             webSocket: storageRef.current.webSocket,
             discInfo: discInfo,
-            setDiscInfo: setDiscInfo
+            setDiscInfo: setDiscInfo,
+            cam: cam,
+            setCam: setCam
         };
         setRender(!render);
-    }, [songs]);
+
+        if (cam) {
+            async function hideCam() {
+                let camEl = document.getElementById("html5-qrcode-button-camera-stop");
+                while (!camEl) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    camEl = document.getElementById("html5-qrcode-button-camera-stop");
+                }
+                console.log("Cam found");
+                camEl.addEventListener("click",
+                    () => {
+                        setCam(false);
+                        console.log("Cam hidden");
+                    }
+                );
+            }
+
+            hideCam();
+        }
+    }, [songs, cam, window.innerWidth, window.innerHeight]);
 
     useEffect(() => {
         fetchSongs(username).then(fetchedSongs => {
@@ -238,21 +256,50 @@ function App() {
         }, 5000);
     }
 
+    function checkIfSmartphone() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const aspectRatio = width / height;
+
+        // Definiere typische Grenzen für Smartphones
+        const minAspectRatio = 1 / 2.2;
+        const maxAspectRatio = 1 / 1.5;
+
+        if (aspectRatio >= minAspectRatio && aspectRatio <= maxAspectRatio) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
     return (
-        <div className={"container"}>
-            <Topbar storage={storageRef.current}/>
-            <Content storage={storageRef.current}/>
-            <Footer storage={storageRef.current}/>
-            <Html5QrcodePlugin qrCodeSuccessCallback={(qrCodeMessage) => {
-                console.log(qrCodeMessage);
-                alert(qrCodeMessage);
-                // storageRef.current.webSocket.send(JSON.stringify({
-                //     request: Topic.DISC.ADD,
-                //     topic: Topic.DESCRIPTORS.DISC,
-                //     ean: qrCodeMessage
-                // }));
-            }}/>
-        </div>
+        <>
+            {checkIfSmartphone() ? <Html5QrcodePlugin qrCodeSuccessCallback={(data) => {
+                    storageRef.current.webSocket.send(JSON.stringify({
+                        request: Topic.SEARCH.START,
+                        topic: Topic.DESCRIPTORS.SEARCH,
+                        ean: data
+                    }));
+                    let camEl = document.getElementById("html5-qrcode-button-camera-stop");
+                    camEl.click();
+                }}/> :
+                <div className={"container"}>
+                    <Topbar storage={storageRef.current}/>
+                    <Content storage={storageRef.current}/>
+                    <Footer storage={storageRef.current}/>
+                    {storageRef.current.cam &&
+                        <Html5QrcodePlugin qrCodeSuccessCallback={(data) => {
+                        storageRef.current.webSocket.send(JSON.stringify({
+                            request: Topic.SEARCH.START,
+                            topic: Topic.DESCRIPTORS.SEARCH,
+                            ean: data
+                        }));
+                        let camEl = document.getElementById("html5-qrcode-button-camera-stop");
+                        camEl.click();
+                    }}/>}
+                </div>}
+        </>
     );
 }
 

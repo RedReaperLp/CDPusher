@@ -71,10 +71,11 @@ a {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    width: 30%;
-    height: 30%;
+    width: 100%;
+    height: 100%;
     background: var(--song-background-color);
     border-radius: 8px;
+    margin: 20px;
 }
 
 .scanner_container {

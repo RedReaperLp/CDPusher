@@ -18,7 +18,10 @@ function LeftBAR({storage}) {
                 height: "40px",
                 width: "40px",
             }}>
-                <img id={"disc-logo"} height={"40px"} width={"40px"} src={"https://www.svgrepo.com/show/880/compact-disc.svg"}
+                <img onClick={() => {
+                    storage.setCam(!storage.cam);
+                }} id={"disc-logo"} height={"40px"} width={"40px"}
+                     src={"https://www.svgrepo.com/show/880/compact-disc.svg"}
                      alt="logo"/>
             </div>
             <div className="left-bar__search">
