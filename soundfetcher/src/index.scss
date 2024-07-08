@@ -1,91 +1,121 @@
 :root {
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-    line-height: 1.5;
-    font-weight: 400;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
 
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 
-    @media (prefers-color-scheme: light) {
-        --background-color: #f9f9f9;
-        --foreground-color: #242424;
-        --song-background-color: #333333;
-    }
+  @media (prefers-color-scheme: light) {
+    --background-color: #f9f9f9;
+    --foreground-color: #242424;
+    --song-background-color: #333333;
+  }
 
-    --white-text: #f9f9f9;
-    --secondary-background-color: #222222;
-    --foreground-color: #f9f9f9;
-    --background-color: #000000;
-    --primary-color: #646cff;
-    --song-background-color: #444444;
-    --secondary-color: #ff6464;
-    --error-color: #ff0000;
+  --white-text: #f9f9f9;
+  --secondary-background-color: #222222;
+  --foreground-color: #f9f9f9;
+  --background-color: #000000;
+  --primary-color: #646cff;
+  --song-background-color: #444444;
+  --secondary-color: #ff6464;
+  --error-color: #ff0000;
 
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 button {
-    border-radius: 8px;
-    border: 1px solid transparent;
-    padding: 0.6em 1.2em;
-    font-size: 1em;
-    font-weight: 500;
-    font-family: inherit;
-    background-color: var(--primary-color);
-    color: var(--background-color);
-    cursor: pointer;
-    transition: border-color 0.25s;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: var(--primary-color);
+  color: var(--background-color);
+  cursor: pointer;
+  transition: border-color 0.25s;
 }
 
 body {
-    background-color: var(--background-color);
-    color: #f9f9f9;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    scroll-behavior: smooth;
+  background-color: var(--background-color);
+  color: #f9f9f9;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  scroll-behavior: smooth;
 }
 
 button:hover {
-    border-color: #646cff;
+  border-color: #646cff;
 }
 
 button:focus,
 button:focus-visible {
-    outline: 4px auto -webkit-focus-ring-color;
+  outline: 4px auto -webkit-focus-ring-color;
 }
 
 a {
-    color: var(--foreground-color);
-    text-decoration: none;
+  color: var(--foreground-color);
+  text-decoration: none;
 }
 
 ::-webkit-scrollbar {
-    width: 0;
+  width: 0;
 }
 
 .scanner {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    background: var(--song-background-color);
-    border-radius: 8px;
-    margin: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 95%;
+  height: 95%;
+  background: var(--song-background-color);
+  border-radius: 8px;
 }
 
 .scanner_container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.loading_cam {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: var(--error-color);
+  border-radius: 8px;
+  margin: 20px;
+  width: 60%;
+  height: 30%;
+
+  .loading {
+    height: 100px;
+    width: 100px;
+    position: relative;
+    top: 25px;
+  }
+}
+
+@media screen and (orientation: portrait) {
+  .loading_cam {
+    width: 50%;
+    height: 30%;
+
+    .loading {
+      height: 50px;
+      width: 50px;
+    }
+  }
 }

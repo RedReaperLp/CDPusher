@@ -3,6 +3,7 @@ package com.github.redreaperlp.cdpusher.http;
 import com.github.redreaperlp.cdpusher.data.disc.DiscInformation;
 import com.github.redreaperlp.cdpusher.data.disc.DiscOGsSong;
 import com.github.redreaperlp.cdpusher.util.logger.types.ErrorPrinter;
+import com.github.redreaperlp.cdpusher.util.logger.types.TestPrinter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -63,11 +64,17 @@ public class DiscOgsSearch {
             HttpRequest request = HttpRequest.newBuilder(uri).GET().build();
             JSONObject res = new JSONObject(CliManager.send(request));
             List<DiscOGsSong> songs = new ArrayList<>();
+            JSONArray artists = res.getJSONArray("artists");
+            String artist = "";
+            if (artists.length() > 0) {
+                artist = artists.getJSONObject(0).getString("name");
+            }
+
             if (!res.has("tracklist")) return songs;
 
             var tracklist = res.getJSONArray("tracklist");
             for (int i = 0; i < tracklist.length(); i++) {
-                DiscOGsSong t = new DiscOGsSong((JSONObject) tracklist.get(i), i);
+                DiscOGsSong t = new DiscOGsSong((JSONObject) tracklist.get(i), i, artist);
                 songs.add(t);
             }
             return songs;

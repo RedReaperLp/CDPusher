@@ -4,22 +4,28 @@ import {useEffect, useState} from "react";
 import {Topic} from "../Topic.js";
 
 function Content({storage}) {
-    function testEans() {
-        const eans = ["0 600753 962565", "4 053804 318761", "5 099920 596323", "5 099748 744425"]
-        return eans.map((ean) => {
-            return (
-                <div key={ean} onClick={() => {
-                    storage.webSocket.send(JSON.stringify(({
-                        request: Topic.SEARCH.START,
-                        topic: Topic.DESCRIPTORS.SEARCH,
-                        ean: ean
-                    })))
-                }}>
-                    <a>{ean} - - - - Click to Fetch
-                        songs {ean === "5 099920 596323" && "- Click to see what happens when the CD is not documented well enough"} </a>
+    function showInfo() {
+        return (
+            <>
+                <div>
+                    <ul>
+                        <li>
+                            <a>To search a song, either use your smartphone to scan a Barcode on this site</a><br/>
+                            <ul>
+                                <li>
+                                    <a>Note that you need to use the same Username, if you don't know the username
+                                    anymore,<br/>click
+                                    on the footer to log out</a><br/>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a>Otherwise you can enter the Ean manually in the field at the top left corner</a>
+                        </li>
+                    </ul>
                 </div>
-            )
-        })
+            </>
+        )
     }
 
     const [popup, setPopup] = useState({});
@@ -47,8 +53,7 @@ function Content({storage}) {
     return (
         <div className={"content"}>
             {popup && <Popup song={popup} storage={storage} closePopup={() => closePopup()}/>}
-            <a>Test EAN's - Optionally use the Searchbar above to search manually</a>
-            {testEans()}
+            {storage.songs.length == 0 && showInfo()}
             {storage.songs && storage.songs.map((song) => {
                 let className = "song";
                 if (song.spotify_mismatch || !song.spotify_search) {

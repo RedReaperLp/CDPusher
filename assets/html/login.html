@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+<div class="container">
+    <div class="login">
+        <h2>Login</h2>
+        <div class="group">
+            <label for="username">
+                Username
+            </label>
+            <input id="username" type="text" placeholder="Username">
+            <button onclick="login()">Login</button>
+        </div>
+    </div>
+</div>
+<style>
+    body {
+        background: #1a1a1a;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .login {
+        background: #333;
+        padding: 20px;
+        border-radius: 10px;
+        width: 200px;
+        height: 150px;
+    }
+
+    h2 {
+        color: #fff;
+        margin: 0;
+        text-align: center;
+    }
+
+    label {
+        margin-top: 20px;
+        color: #fff;
+    }
+
+    .group {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    input {
+        margin: 10px 0;
+        padding: 5px;
+        border-radius: 5px;
+        border: none;
+    }
+
+    button {
+        padding: 5px;
+        border-radius: 5px;
+        border: none;
+        background: #fff;
+        color: #333;
+    }
+</style>
+<script>
+    function login() {
+        const username = document.getElementById('username').value;
+        document.cookie = `username=${username}`;
+        window.location.href = '/';
+    }
+</script>
+</body>
+</html>

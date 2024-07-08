@@ -47,6 +47,9 @@ export function Popup({song, storage, closePopup}) {
             if (value === null) {
                 return;
             }
+            if (value.value === "" || value.value === null) {
+                return;
+            }
             storage.webSocket.send(
                 JSON.stringify({
                     request: Topic.SONGS.UPDATE,

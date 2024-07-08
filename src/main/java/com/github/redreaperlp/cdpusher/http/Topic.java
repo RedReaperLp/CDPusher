@@ -137,7 +137,12 @@ public class Topic {
                     }
                 }
                 case CLEAR -> {
-                    if (user.isSearching()) return;
+                    if (user.isSearching()) {
+                        session.send(Topic.Disc.STILL_INDEXING
+                                .fillResponse(Topic.Request.ERROR)
+                                .toString());
+                        return;
+                    }
                     user.clearSongs();
                 }
             }
@@ -178,10 +183,14 @@ public class Topic {
         public void handleRequest(JSONObject request, User user, WebsocketSession session) {
             switch (this) {
                 case START -> {
-                    user.clearSongs();
-                    user.setSearching(true);
-                    user.broadcastMessage(Search.START.fillResponse(Request.SUCCESS).toString());
-                    searchSong(request.getString("ean").replace(" ", ""), user);
+                    if (user.isSearching()) {
+                        session.send(Disc.STILL_INDEXING.fillResponse(Request.SEARCH).toString());
+                    } else {
+                        user.clearSongs();
+                        user.setSearching(true);
+                        user.broadcastMessage(Search.START.fillResponse(Request.SUCCESS).toString());
+                        searchSong(request.getString("ean").replace(" ", ""), user);
+                    }
                 }
             }
         }

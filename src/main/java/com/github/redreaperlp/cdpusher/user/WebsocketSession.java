@@ -47,7 +47,6 @@ public class WebsocketSession implements WebSocketListener {
 
             var l = Topic.findEnumByValue(message.getString("topic"), message.getString("request"));
             if (l != null) {
-                new TestPrinter().append(l.toString()).print();
                 l.handleRequest(message, user, this);
             } else {
                 new TestPrinter().append(message.toString(1)).print();

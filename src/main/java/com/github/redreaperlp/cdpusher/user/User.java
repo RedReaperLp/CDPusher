@@ -4,6 +4,7 @@ import com.github.redreaperlp.cdpusher.data.disc.DiscInformation;
 import com.github.redreaperlp.cdpusher.data.song.Song;
 import com.github.redreaperlp.cdpusher.data.song.SongData;
 import com.github.redreaperlp.cdpusher.http.Topic;
+import com.github.redreaperlp.cdpusher.util.logger.types.TestPrinter;
 import org.json.JSONArray;
 
 import java.time.LocalDateTime;

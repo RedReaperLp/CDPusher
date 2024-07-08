@@ -1,9 +1,12 @@
-import {Topic} from "../Topic.js";
-
 function Footer({storage}) {
+    function logout() {
+        document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        window.location.reload();
+    }
+
     return (
         <div className={"footer"}>
-            <a>© 2024 RedReaperLp</a>
+            <a onClick={() => logout()}>© 2024 RedReaperLp</a>
         </div>
     );
 }

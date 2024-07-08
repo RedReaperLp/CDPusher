@@ -3,6 +3,7 @@ package com.github.redreaperlp.cdpusher.data.disc;
 import com.github.redreaperlp.cdpusher.data.song.Song;
 import com.github.redreaperlp.cdpusher.database.DatabaseManager;
 import com.github.redreaperlp.cdpusher.http.DiscOgsSearch;
+import com.github.redreaperlp.cdpusher.http.Topic;
 import com.github.redreaperlp.cdpusher.user.User;
 import com.github.redreaperlp.cdpusher.util.Value;
 import com.github.redreaperlp.cdpusher.util.logger.types.ErrorPrinter;
@@ -38,6 +39,8 @@ public class DiscInformation {
         var songs = DiscOgsSearch.getInstance().searchDiscTracks(this);
         if (songs.isEmpty()) {
             new InfoPrinter().append("Failed to load tracks for " + title).print();
+            requester.broadcastMessage(Topic.Disc.FAILED.fillResponse(Topic.Request.ERROR)
+                    .put("message", "Failed to load tracks for " + title).toString());
             return;
         }
         int i = 0;

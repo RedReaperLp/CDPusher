@@ -3,7 +3,8 @@ echo
 cd /root/Reaper/projects/CDPusher
 echo -n "Starting gradle build! > "
 echo
-gradle shadowJar
+sed -i 's/\r$//' gradlew
+./gradlew shadowJar
 echo
 echo -n "Done > "
 
@@ -13,8 +14,9 @@ npx vite build
 cd ..
 echo "Build process completed."
 echo "Copying build files to public folder..."
-yes | cp -rf soundfetcher/dist/assets/index.js assets/js/SoundFetcher.js
-yes | cp -rf soundfetcher/dist/assets/index.css assets/css/SoundFetcher.css
+yes | cp -rf soundfetcher/dist/assets/index.js assets/js/index.js
+yes | cp -rf soundfetcher/dist/assets/index.css assets/css/index.css
+yes | cp -rf soundfetcher/dist/assets/index2.js assets/js/index2.js
 
 
 echo

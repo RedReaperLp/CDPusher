@@ -6,6 +6,7 @@ import {fetchSongs} from "./Fetching.jsx";
 import Swal from "sweetalert2";
 import {findTopic, Topic} from "./Topic.js";
 import Html5QrcodePlugin from "./QRCodeScanner.jsx";
+import Html5QrcodePluginWithSuspense from "./QRCodeScanner.jsx";
 
 let wsString;
 if (window.location.hostname === "localhost" || window.location.hostname === "45.81.235.52") {
@@ -140,7 +141,7 @@ function App() {
     const [render, setRender] = useState(false);
     const [discInfo, setDiscInfo] = useState({});
     const ws = useMemo(() => new WebSocket(wsString + window.location.hostname + "/api/ws/"), []); // Initialize WebSocket
-    const username = "RerLp";
+    const username = document.cookie.split("=")[1];
     let [cam, setCam] = useState();
     const storageRef = useRef({
         songs: songs,
@@ -219,29 +220,18 @@ function App() {
         setRender(!render);
 
         if (cam) {
-            async function hideCam() {
-                let camEl = document.getElementById("html5-qrcode-button-camera-stop");
-                while (!camEl) {
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    camEl = document.getElementById("html5-qrcode-button-camera-stop");
-                }
-                console.log("Cam found");
-                camEl.addEventListener("click",
-                    () => {
-                        setCam(false);
-                        console.log("Cam hidden");
-                    }
-                );
-            }
-
-            hideCam();
+            hideCam(setCam);
         }
-    }, [songs, cam, window.innerWidth, window.innerHeight]);
+    }, [songs, cam]);
 
     useEffect(() => {
         fetchSongs(username).then(fetchedSongs => {
             setSongs(fetchedSongs.songs);
             setDiscInfo(fetchedSongs.disc);
+        });
+
+        document.addEventListener("keydown", (evt) => {
+            if (evt.key === "Escape") setCam(false);
         });
     }, []);
 
@@ -261,7 +251,6 @@ function App() {
         const height = window.innerHeight;
         const aspectRatio = width / height;
 
-        // Definiere typische Grenzen für Smartphones
         const minAspectRatio = 1 / 2.2;
         const maxAspectRatio = 1 / 1.5;
 
@@ -272,10 +261,9 @@ function App() {
         }
     }
 
-
     return (
         <>
-            {checkIfSmartphone() ? <Html5QrcodePlugin qrCodeSuccessCallback={(data) => {
+            {checkIfSmartphone() ? <Html5QrcodePluginWithSuspense qrCodeSuccessCallback={(data) => {
                     storageRef.current.webSocket.send(JSON.stringify({
                         request: Topic.SEARCH.START,
                         topic: Topic.DESCRIPTORS.SEARCH,
@@ -289,17 +277,35 @@ function App() {
                     <Content storage={storageRef.current}/>
                     <Footer storage={storageRef.current}/>
                     {storageRef.current.cam &&
-                        <Html5QrcodePlugin qrCodeSuccessCallback={(data) => {
-                        storageRef.current.webSocket.send(JSON.stringify({
-                            request: Topic.SEARCH.START,
-                            topic: Topic.DESCRIPTORS.SEARCH,
-                            ean: data
-                        }));
-                        let camEl = document.getElementById("html5-qrcode-button-camera-stop");
-                        camEl.click();
-                    }}/>}
+                        <Html5QrcodePluginWithSuspense props={storageRef.current} qrCodeSuccessCallback={(data) => {
+                            storageRef.current.webSocket.send(JSON.stringify({
+                                request: Topic.SEARCH.START,
+                                topic: Topic.DESCRIPTORS.SEARCH,
+                                ean: data
+                            }));
+                            let camEl = document.getElementById("html5-qrcode-button-camera-stop");
+                            camEl.click();
+                        }} qrCodeErrorCallback={(data) => {
+                            let camEl = document.getElementById("html5-qrcode-button-camera-stop");
+                            camEl.click();
+                        }}/>}
                 </div>}
         </>
+    );
+}
+
+async function hideCam(setCam) {
+    let camEl = document.getElementById("html5-qrcode-button-camera-stop");
+    while (!camEl) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        camEl = document.getElementById("html5-qrcode-button-camera-stop");
+    }
+    console.log("Cam found");
+    camEl.addEventListener("click",
+        () => {
+            setCam(false);
+            console.log("Cam hidden");
+        }
     );
 }
 

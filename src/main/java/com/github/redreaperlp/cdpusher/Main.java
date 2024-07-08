@@ -48,7 +48,12 @@ public class Main {
             });
         }).start(80);
         new GetUser(app);
-        app.get("/", ctx -> ContentTypes.HTML.setContentType(ctx, FileAccessor.html("index.html")));
+        app.get("/", ctx -> {
+            if (ctx.cookie("username") == null) {
+                ContentTypes.HTML.setContentType(ctx, FileAccessor.html("login.html"));
+            }
+            ContentTypes.HTML.setContentType(ctx, FileAccessor.html("index.html"));
+        });
         app.ws("/api/ws", ws -> {
             ws.onConnect(ctx -> {
                 SocketManager.getInstance().addSession(new WebsocketSession(ctx));

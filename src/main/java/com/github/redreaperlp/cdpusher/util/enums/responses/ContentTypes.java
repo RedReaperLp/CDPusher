@@ -33,7 +33,7 @@ public enum ContentTypes {
     ;
     private String contentType;
 
-    private ContentTypes(String contentType) {
+    ContentTypes(String contentType) {
         this.contentType = contentType;
     }
 

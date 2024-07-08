@@ -10,7 +10,7 @@ import org.json.JSONObject;
 import java.text.Normalizer;
 
 public class DiscOGsSong extends SongData {
-    public DiscOGsSong(JSONObject data, long songID) {
+    public DiscOGsSong(JSONObject data, long songID, String artist) {
         this.songID = songID;
         long timeInSeconds = 0;
         try {
@@ -19,20 +19,28 @@ public class DiscOGsSong extends SongData {
         } catch (Exception e) {
         }
 
-        String[] position = data.getString("position").split("-");
-        if (position.length > 1) {
-            this.discNo = Integer.parseInt(position[0]);
-            this.trackNo = Integer.parseInt(position[1]);
-        } else if (position.length == 1) {
-            this.trackNo = Integer.parseInt(position[0]);
+        try {
+            String[] position = data.getString("position").split("-");
+            if (position.length > 1) {
+                this.discNo = Integer.parseInt(position[0]);
+                this.trackNo = Integer.parseInt(position[1]);
+            } else if (position.length == 1) {
+                this.trackNo = Integer.parseInt(position[0]);
+            }
+        } catch (Exception e) {
+            this.discNo = -1;
+            this.trackNo = -1;
         }
+
 
         this.title = data.getString("title");
         try {
             var arr = data.getJSONArray("artists");
             this.artist = arr.getJSONObject(0).getString("name");
         } catch (Exception e) {
-            this.spotifySearch = false;
+            if (!artist.isEmpty()) {
+                this.artist = artist;
+            } else this.spotifySearch = false;
         }
         this.timeInSeconds = timeInSeconds;
     }
