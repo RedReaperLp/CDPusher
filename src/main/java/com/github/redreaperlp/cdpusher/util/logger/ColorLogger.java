@@ -8,6 +8,7 @@ public interface ColorLogger {
         return this;
     }
     ColorLogger appendNewLine(String message, Color color);
+
     default ColorLogger appendNewLine(String message) {
         appendNewLine(message, Color.RESET);
         return this;

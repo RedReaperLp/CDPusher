@@ -3,7 +3,7 @@ package com.github.redreaperlp.cdpusher.http;
 import com.github.redreaperlp.cdpusher.data.disc.DiscInformation;
 import com.github.redreaperlp.cdpusher.data.disc.DiscOGsSong;
 import com.github.redreaperlp.cdpusher.util.logger.types.ErrorPrinter;
-import com.github.redreaperlp.cdpusher.util.logger.types.TestPrinter;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -58,28 +58,36 @@ public class DiscOgsSearch {
         }
     }
 
-    public List<DiscOGsSong> searchDiscTracks(DiscInformation discInformation) {
+    public @Nullable List<DiscOGsSong> searchDiscTracks(DiscInformation discInformation) {
         URI uri = URI.create(discInformation.getResourceURL());
+        JSONObject res = null;
         try {
             HttpRequest request = HttpRequest.newBuilder(uri).GET().build();
-            JSONObject res = new JSONObject(CliManager.send(request));
+            res = new JSONObject(CliManager.send(request));
             List<DiscOGsSong> songs = new ArrayList<>();
-            JSONArray artists = res.getJSONArray("artists");
+            JSONArray artists = new JSONArray();
+            if (res.has("artists")) {
+                artists = res.getJSONArray("artists");
+            }
             String artist = "";
-            if (artists.length() > 0) {
+            if (!artists.isEmpty()) {
                 artist = artists.getJSONObject(0).getString("name");
             }
 
             if (!res.has("tracklist")) return songs;
 
-            var tracklist = res.getJSONArray("tracklist");
-            for (int i = 0; i < tracklist.length(); i++) {
-                DiscOGsSong t = new DiscOGsSong((JSONObject) tracklist.get(i), i, artist);
+            var trackList = res.getJSONArray("tracklist");
+            for (int i = 0; i < trackList.length(); i++) {
+                DiscOGsSong t = new DiscOGsSong((JSONObject) trackList.get(i), i, artist);
                 songs.add(t);
             }
             return songs;
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+            new ErrorPrinter().appendException(e).appendNewLine("Failed to search for tracks of " + discInformation.getTitle())
+                    .appendNewLine("Received response: ")
+                    .appendNewLine(res == null ? "null" : res.toString(2))
+                    .print();
         }
+        return null;
     }
 }

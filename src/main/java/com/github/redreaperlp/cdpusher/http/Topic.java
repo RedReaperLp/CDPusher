@@ -7,6 +7,7 @@ import com.github.redreaperlp.cdpusher.data.song.SongDataKeys;
 import com.github.redreaperlp.cdpusher.data.song.SongMismatch;
 import com.github.redreaperlp.cdpusher.user.User;
 import com.github.redreaperlp.cdpusher.user.WebsocketSession;
+import com.github.redreaperlp.cdpusher.util.logger.types.WarnPrinter;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -242,6 +243,13 @@ public class Topic {
         public void handleRequest(JSONObject request, User user, WebsocketSession session) {
             switch (this) {
                 case UPDATE -> {
+                    if (!request.has("uri") || !request.has("song_id")) {
+                        new WarnPrinter()
+                                .append(user.getUsername())
+                                .appendNewLine("Failed to update song, because of missing data")
+                                .print();
+                        return;
+                    }
                     String songURI = request.getString("uri");
                     long songID = request.getLong(SongDataKeys.SONG_ID.getKey());
 

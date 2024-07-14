@@ -4,7 +4,7 @@ import com.github.redreaperlp.cdpusher.data.song.Song;
 import com.github.redreaperlp.cdpusher.data.song.SongData;
 import com.github.redreaperlp.cdpusher.data.song.SongMismatch;
 import com.github.redreaperlp.cdpusher.http.SpotifySearch;
-import com.github.redreaperlp.cdpusher.util.logger.types.TestPrinter;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.text.Normalizer;
@@ -64,7 +64,10 @@ public class DiscOGsSong extends SongData {
             int duration = track.getInt("duration_ms") / 1000;
             String albumName = album.getString("name");
             String albumReleaseDate = album.getString("release_date");
-            String cover = album.getJSONArray("images").getJSONObject(0).getString("url");
+            JSONArray images = album.getJSONArray("images");
+            String cover = null;
+            if (!images.isEmpty())
+                cover = images.getJSONObject(0).getString("url");
 
             var song = new Song(this);
             song.setTitle(title);
@@ -73,7 +76,7 @@ public class DiscOGsSong extends SongData {
             song.setYear(Integer.parseInt(albumReleaseDate.split("-")[0]));
             song.setTimeInSeconds(duration);
             song.setImageURI(cover);
-            if (titlesMatch(this.title, normalizedTitle)) {
+            if (titlesMatch(this.title, normalizedTitle) || images.isEmpty()) {
                 return song;
             } else {
                 var mismatch = new SongMismatch(this, song);

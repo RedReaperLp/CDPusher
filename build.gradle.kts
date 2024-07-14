@@ -14,7 +14,6 @@ repositories {
 }
 
 dependencies {
-    implementation("io.javalin", "javalin", "5.6.3")
     implementation("org.json", "json", "20231013")
     implementation("com.zaxxer", "HikariCP", "5.1.0")
     implementation("mysql", "mysql-connector-java", "8.0.33")
@@ -22,11 +21,15 @@ dependencies {
     implementation("org.slf4j", "slf4j-api", "1.7.30")
     implementation("ch.qos.logback", "logback-classic", "1.4.11")
 
-    testImplementation("junit:junit:4.13.2")
+    implementation("io.javalin", "javalin", "6.1.3")
+    implementation("io.javalin.community.ssl", "ssl-plugin", "6.1.3")
 
+    testImplementation("junit:junit:4.13.2")
 }
 
 tasks.withType<ShadowJar> {
+    mergeServiceFiles()
+    exclude("org.eclipse.jetty.http2:http2-hpack")
     manifest {
         attributes["Main-Class"] = "com.github.redreaperlp.cdpusher.Main"
     }

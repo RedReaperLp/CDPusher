@@ -4,6 +4,7 @@ import com.github.redreaperlp.cdpusher.api.get.GetUser;
 import com.github.redreaperlp.cdpusher.data.disc.DiscInformation;
 import com.github.redreaperlp.cdpusher.database.DatabaseConfiguration;
 import com.github.redreaperlp.cdpusher.http.DiscOgsSearch;
+import com.github.redreaperlp.cdpusher.http.Topic;
 import com.github.redreaperlp.cdpusher.user.SocketManager;
 import com.github.redreaperlp.cdpusher.user.WebsocketSession;
 import com.github.redreaperlp.cdpusher.util.FileAccessor;
@@ -11,7 +12,7 @@ import com.github.redreaperlp.cdpusher.util.enums.responses.CacheControl;
 import com.github.redreaperlp.cdpusher.util.enums.responses.ContentTypes;
 import com.github.redreaperlp.cdpusher.util.logger.Loggers;
 import io.javalin.Javalin;
-import io.javalin.plugin.bundled.CorsPluginConfig;
+import io.javalin.community.ssl.SslPlugin;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -42,11 +43,18 @@ public class Main {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+
+        SslPlugin plugin = new SslPlugin(conf -> {
+            conf.pemFromPath("/root/SSL/redreaperlp.de.pem", "/root/SSL/redreaperlp.de.key");
+            conf.http2 = true;
+            conf.securePort = 1357;
+            conf.insecure = false;
+        });
+
         Javalin app = Javalin.create(config -> {
-            config.plugins.enableCors(cors -> {
-                cors.add(CorsPluginConfig::anyHost);
-            });
-        }).start(80);
+            config.registerPlugin(plugin);
+        }).start();
+
         new GetUser(app);
         app.get("/", ctx -> {
             if (ctx.cookie("username") == null) {
@@ -75,7 +83,8 @@ public class Main {
                 String ean = ctx.pathParam("ean").replace(" ", "");
                 DiscInformation info = DiscOgsSearch.getInstance().searchEan(ean);
                 if (info == null) {
-                    ctx.result(new JSONObject().put("error", "No CD found").toString());
+                    ctx.result(Topic.Disc.NOT_FOUND.fillResponse(Topic.Request.ERROR)
+                            .put("message", "No disc found").toString());
                     return;
                 }
                 ctx.result(info.toJSON().toString());
@@ -93,7 +102,6 @@ public class Main {
         app.get("/assets/*", ctx -> {
             String path = ctx.path().substring(8);
             String[] split = path.split("/");
-            System.out.println(ctx.path());
             CacheControl.NO_CACHE.setCacheControl(ctx);
             switch (split[0]) {
                 case "html":

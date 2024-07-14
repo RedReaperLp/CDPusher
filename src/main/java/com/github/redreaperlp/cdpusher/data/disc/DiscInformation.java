@@ -37,17 +37,23 @@ public class DiscInformation {
 
     public void loadTracks(User requester) {
         var songs = DiscOgsSearch.getInstance().searchDiscTracks(this);
-        if (songs.isEmpty()) {
+        if (songs == null || songs.isEmpty()) {
             new InfoPrinter().append("Failed to load tracks for " + title).print();
             requester.broadcastMessage(Topic.Disc.FAILED.fillResponse(Topic.Request.ERROR)
                     .put("message", "Failed to load tracks for " + title).toString());
             return;
         }
         int i = 0;
-        for (DiscOGsSong song : songs) {
-            song.songID = i++;
-            var validation = song.spotifySearch();
-            requester.addSong(validation);
+        try {
+            for (DiscOGsSong song : songs) {
+                song.songID = i++;
+                var validation = song.spotifySearch();
+                requester.addSong(validation);
+            }
+        } catch (Exception e) {
+            new ErrorPrinter().appendException(e).print();
+            requester.broadcastMessage(Topic.Disc.FAILED.fillResponse(Topic.Request.ERROR)
+                    .put("message", "Failed to load tracks for " + title).toString());
         }
     }
 
